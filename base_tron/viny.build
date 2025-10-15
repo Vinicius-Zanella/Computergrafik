@@ -1,0 +1,6 @@
+
+set -e
+
+gcc main.c -o exe -lglfw -lGL
+./exe
+
