@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+# create directories if not existent
+mkdir -p build
+mkdir -p bin
+
+gcc -Wall -c src/main.c -Iinclude -o build/main.o
+gcc -Wall -c src/render.c -Iinclude -o build/render.o
+gcc -Wall -c src/update.c -Iinclude -o build/update.o
+gcc -Wall -c src/world.c -Iinclude -o build/world.o
+
+gcc build/main.o build/render.o build/update.o build/world.o -o bin/exe -lglfw -lGL -lm
+
+./bin/exe
+
