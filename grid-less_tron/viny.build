@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+gcc main.c -o exe -lglfw -lGL -lm
+./exe
+
