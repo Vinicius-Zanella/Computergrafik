@@ -7,13 +7,14 @@ mkdir -p build
 mkdir -p bin
 
 gcc -Wall -c src/main.c -Iinclude -o build/main.o
-#gcc -Wall -c src/render.c -Iinclude -o build/render.o
-#gcc -Wall -c src/update.c -Iinclude -o build/update.o
-#gcc -Wall -c src/world.c -Iinclude -o build/world.o
+gcc -Wall -c src/render.c -Iinclude -o build/render.o
+gcc -Wall -c src/update.c -Iinclude -o build/update.o
+gcc -Wall -c src/input.c -Iinclude -o build/input.o
+gcc -Wall -c src/world.c -Iinclude -o build/world.o
 
 
-gcc build/main.o -o bin/exe -lglfw -lGL -lm
-#gcc build/main.o build/render.o build/update.o build/world.o -o bin/exe -lglfw -lGL -lm
+#gcc build/main.o -o bin/exe -lglfw -lGL -lm
+gcc build/main.o build/render.o build/update.o build/input.o build/world.o -o bin/exe -lglfw -lGL -lm
 
 ./bin/exe
 
