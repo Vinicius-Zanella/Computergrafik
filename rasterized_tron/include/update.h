@@ -1,3 +1,5 @@
 #pragma once
 
-void update(void);
+void update(float dt);
+
+void initGame(void);

@@ -1,22 +1,50 @@
+#include <stdio.h>
 #include "../include/world.h"
 #include "../include/input.h"
 
-///TODO make the input in itself consistent, but make it custom mappable from outside
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action != GLFW_PRESS) return;	
 	if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-	// - Player 1 input -
-	char *input = &getPlayerData(1)->input;
-	if (key == GLFW_KEY_W && *input != 'S' && *input != 'W') { *input = 'W'; addCorner(1); }
-	if (key == GLFW_KEY_A && *input != 'D' && *input != 'A') { *input = 'A'; addCorner(1); }
-	if (key == GLFW_KEY_S && *input != 'W' && *input != 'S') { *input = 'S'; addCorner(1); }
-	if (key == GLFW_KEY_D && *input != 'A' && *input != 'D') { *input = 'D'; addCorner(1); }
+	//printf("Key: %c, Nr: %d\n", key, key);
+
+	if (key == ' ') {
+		spectator = (spectator == 1) ? 0 : 1;
+		printf("Spectator: %d\n", spectator);
+	} 
+
+	if (spectator) {
+		// - Camera movement -
+		Input i = getInput(1);
+		int *input = &getCameraData(1)->input;
+		if (key == (int)i.Upwa) { *input = (*input == (int)i.Upwa) ? ' ' : i.Upwa; } else
+		if (key == (int)i.Left) { *input = (*input == (int)i.Left) ? ' ' : i.Left; } else
+		if (key == (int)i.Down) { *input = (*input == (int)i.Down) ? ' ' : i.Down; } else
+		if (key == (int)i.Rigt) { *input = (*input == (int)i.Rigt) ? ' ' : i.Rigt; } else
+		if (key == (int)i.Qsud) { *input = (*input == (int)i.Qsud) ? ' ' : i.Qsud; } else
+		if (key == (int)i.Esud) { *input = (*input == (int)i.Esud) ? ' ' : i.Esud; }
+		i = getInput(2);
+		if (key == (int)i.Upwa) { *input = (*input == (int)i.Upwa) ? ' ' : i.Upwa; } else
+		if (key == (int)i.Left) { *input = (*input == (int)i.Left) ? ' ' : i.Left; } else
+		if (key == (int)i.Down) { *input = (*input == (int)i.Down) ? ' ' : i.Down; } else
+		if (key == (int)i.Rigt) { *input = (*input == (int)i.Rigt) ? ' ' : i.Rigt; } else
+		if (key == (int)i.Qsud) { *input = (*input == (int)i.Qsud) ? ' ' : i.Qsud; } else
+		if (key == (int)i.Esud) { *input = (*input == (int)i.Esud) ? ' ' : i.Esud; }
+	} else {
+		// - Player 1 input -
+		Input i = getInput(1);
+		char *input = &getPlayerData(1)->input;
+		if (key == (int)i.Upwa && *input != i.Down && *input != i.Upwa) { *input = i.Upwa; addCorner(1); } else
+		if (key == (int)i.Left && *input != i.Rigt && *input != i.Left) { *input = i.Left; addCorner(1); } else
+		if (key == (int)i.Down && *input != i.Upwa && *input != i.Down) { *input = i.Down; addCorner(1); } else
+		if (key == (int)i.Rigt && *input != i.Left && *input != i.Rigt) { *input = i.Rigt; addCorner(1); }
 	
-	// - Player 2 input -
-	input = &getPlayerData(2)->input;
-	if (key == GLFW_KEY_I && *input != 'K' && *input != 'I') { *input = 'I'; addCorner(2); }
-	if (key == GLFW_KEY_J && *input != 'L' && *input != 'J') { *input = 'J'; addCorner(2); }
-	if (key == GLFW_KEY_K && *input != 'I' && *input != 'K') { *input = 'K'; addCorner(2); }
-	if (key == GLFW_KEY_L && *input != 'J' && *input != 'L') { *input = 'L'; addCorner(2); }
+		// - Player 2 input -
+		i = getInput(2);
+		input = &getPlayerData(2)->input;
+		if (key == (int)i.Upwa && *input != i.Down && *input != i.Upwa) { *input = i.Upwa; addCorner(2); } else
+		if (key == (int)i.Left && *input != i.Rigt && *input != i.Left) { *input = i.Left; addCorner(2); } else
+		if (key == (int)i.Down && *input != i.Upwa && *input != i.Down) { *input = i.Down; addCorner(2); } else
+		if (key == (int)i.Rigt && *input != i.Left && *input != i.Rigt) { *input = i.Rigt; addCorner(2); }
+	}
 }

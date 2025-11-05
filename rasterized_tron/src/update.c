@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <math.h>
 #include "../include/world.h"
 #include "../include/vector.h"
@@ -8,31 +9,46 @@ int isOutOfBounds(iVec2 pos);
 int collidedWithWall(iVec2 pos);
 
 // --- Entry Point ---
-void update(void) {
-	///TODO loop both
-	PlayerData *player = getPlayerData(1);
-	switch (player->input) {	///TODO define speed instead of magic number 1
-		case 'W': player->position.y += 1; break;
-		case 'A': player->position.x -= 1; break;
-		case 'S': player->position.y -= 1; break;
-		case 'D': player->position.x += 1; break;
+void update(float dt) {
+	if (spectator == 1) {
+		// Camera
+		CameraData *camera = getCameraData(1);
+		Input i = getInput(1);
+		if (i.Upwa == camera->input) camera->position.z += 2.5f * dt; else
+		if (i.Left == camera->input) camera->position.x += 2.5f * dt; else
+		if (i.Down == camera->input) camera->position.z -= 2.5f * dt; else
+		if (i.Rigt == camera->input) camera->position.x -= 2.5f * dt; else
+		if (i.Qsud == camera->input) camera->position.y -= 2.5f * dt; else
+		if (i.Esud == camera->input) camera->position.y += 2.5f * dt;
+		i = getInput(2);
+		if (i.Upwa == camera->input) camera->rotation.y -= 42 * dt; else
+		if (i.Left == camera->input) camera->rotation.x -= 42 * dt; else
+		if (i.Down == camera->input) camera->rotation.y += 42 * dt; else
+		if (i.Rigt == camera->input) camera->rotation.x += 42 * dt; else
+		if (i.Qsud == camera->input) camera->rotation.z -= 1 * dt; else
+		if (i.Esud == camera->input) camera->rotation.z += 1 * dt;
+		
+	printf("Camera: (%.1f, %.1f, %.1f)(%.1f, %.1f, %.1f)\n", camera->position.x, camera->position.y, camera->position.z, camera->rotation.x, camera->rotation.y, camera->rotation.z);
+	} else {
+		for (int c=1; c<=2; c++) {
+			///TODO outsource input handling to input file
+			PlayerData *player = getPlayerData(c);
+			const Input i = getInput(c);
+			///TODO define speed instead of magic number 1
+			if (i.Upwa == player->input) player->position.y += 1; else
+			if (i.Left == player->input) player->position.x -= 1; else
+			if (i.Down == player->input) player->position.y -= 1; else
+			if (i.Rigt == player->input) player->position.x += 1;
+	
+			if (collidedWithWall(player->position)) resetWorld();
+	
+			if (isOutOfBounds(player->position)) resetWorld();
+		}
 	}
-	if (collidedWithWall(player->position)) resetWorld();
-	if (isOutOfBounds(player->position)) resetWorld();
-	
-	player = getPlayerData(2);
-	switch (player->input) {	///TODO define speed instead of magic number 1
-		case 'I': player->position.y += 1; break;
-		case 'J': player->position.x -= 1; break;
-		case 'K': player->position.y -= 1; break;
-		case 'L': player->position.x += 1; break;
-	}	
-	if (collidedWithWall(player->position)) resetWorld();
-	if (isOutOfBounds(player->position)) resetWorld();
+}
 
-	// - Bounds -
-	
-	// - Collision -
+void initGame(void) {
+	resetWorld();
 }
 
 int isOutOfBounds(iVec2 pos) {
