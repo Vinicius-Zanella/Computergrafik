@@ -7,7 +7,6 @@
 
 extern int spectator;
 
-
 typedef struct {
 	char Upwa;
 	char Left;
@@ -19,10 +18,13 @@ typedef struct {
 
 Input getInput(int i);
 
+typedef enum {
+	UP, RIGHT, DOWN, LEFT
+} Direction;
 
 typedef struct {
 	iVec2 position;
-	char input;
+	Direction direction;
 	int index;
 	iVec2 trace[WALL_SIZE];
 } PlayerData;

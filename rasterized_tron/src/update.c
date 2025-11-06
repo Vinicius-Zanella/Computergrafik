@@ -11,35 +11,59 @@ int collidedWithWall(iVec2 pos);
 // --- Entry Point ---
 void update(float dt) {
 	if (spectator == 1) {
+		float speed = 50.0f;
+		float turn = 36.0f;
 		// Camera
 		CameraData *camera = getCameraData(1);
 		Input i = getInput(1);
-		if (i.Upwa == camera->input) camera->position.z += 2.5f * dt; else
-		if (i.Left == camera->input) camera->position.x += 2.5f * dt; else
-		if (i.Down == camera->input) camera->position.z -= 2.5f * dt; else
-		if (i.Rigt == camera->input) camera->position.x -= 2.5f * dt; else
-		if (i.Qsud == camera->input) camera->position.y -= 2.5f * dt; else
-		if (i.Esud == camera->input) camera->position.y += 2.5f * dt;
+		if (i.Upwa == camera->input) {
+			camera->position.z += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+			camera->position.x -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+		} else if (i.Left == camera->input) {
+			camera->position.x += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+			camera->position.z += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+		} else if (i.Down == camera->input) {
+			camera->position.z -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+			camera->position.x += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+		} else if (i.Rigt == camera->input) {
+			camera->position.x -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+			camera->position.z -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;} else
+		if (i.Qsud == camera->input) camera->position.y -= speed * dt; else
+		if (i.Esud == camera->input) camera->position.y += speed * dt;
 		i = getInput(2);
-		if (i.Upwa == camera->input) camera->rotation.y -= 42 * dt; else
-		if (i.Left == camera->input) camera->rotation.x -= 42 * dt; else
-		if (i.Down == camera->input) camera->rotation.y += 42 * dt; else
-		if (i.Rigt == camera->input) camera->rotation.x += 42 * dt; else
-		if (i.Qsud == camera->input) camera->rotation.z -= 1 * dt; else
-		if (i.Esud == camera->input) camera->rotation.z += 1 * dt;
+		if (i.Upwa == camera->input) camera->rotation.y -= turn * dt; else
+		if (i.Left == camera->input) camera->rotation.x -= turn * dt; else
+		if (i.Down == camera->input) camera->rotation.y += turn * dt; else
+		if (i.Rigt == camera->input) camera->rotation.x += turn * dt; else
+		if (i.Qsud == camera->input) camera->rotation.z -= turn * dt; else
+		if (i.Esud == camera->input) camera->rotation.z += turn * dt;
 		
-	printf("Camera: (%.1f, %.1f, %.1f)(%.1f, %.1f, %.1f)\n", camera->position.x, camera->position.y, camera->position.z, camera->rotation.x, camera->rotation.y, camera->rotation.z);
+	//printf("Camera: (%.1f, %.1f, %.1f)(%.1f, %.1f, %.1f)\n", camera->position.x, camera->position.y, camera->position.z, camera->rotation.x, camera->rotation.y, camera->rotation.z);
 	} else {
 		for (int c=1; c<=2; c++) {
-			///TODO outsource input handling to input file
+			///TODO activate player 2
+			if (c == 2) break;
+			
 			PlayerData *player = getPlayerData(c);
-			const Input i = getInput(c);
+			CameraData *camera = getCameraData(c);
 			///TODO define speed instead of magic number 1
-			if (i.Upwa == player->input) player->position.y += 1; else
-			if (i.Left == player->input) player->position.x -= 1; else
-			if (i.Down == player->input) player->position.y -= 1; else
-			if (i.Rigt == player->input) player->position.x += 1;
-	
+			if (player->direction == UP) {
+				player->position.y += 1;
+				camera->position.z += 1;
+			} else
+			if (player->direction == LEFT) {
+				player->position.x -= 1;
+				camera->position.x += 1;
+			} else
+			if (player->direction == DOWN) {
+				player->position.y -= 1;
+				camera->position.z -= 1;
+			} else
+			if (player->direction == RIGHT) {
+				player->position.x += 1;
+				camera->position.x -= 1;
+			}
+				
 			if (collidedWithWall(player->position)) resetWorld();
 	
 			if (isOutOfBounds(player->position)) resetWorld();

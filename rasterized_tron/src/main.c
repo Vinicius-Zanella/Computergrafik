@@ -35,7 +35,7 @@ int main() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	double near = 0.1, far = 100.0, fov = 90.0;
+	double near = 0.01, far = 1000.0, fov = 90.0;
 	double aspect = WINDOW_SIZE / WINDOW_SIZE;
 
 	double top = (fov * 0.5 * M_PI / 180.0) * near;
@@ -48,8 +48,8 @@ int main() {
 	glfwSetKeyCallback(window, keyCallback);
 	
 	///TODO remove
-	glPointSize(5.0f);
-	glLineWidth(2.0f);
+	glPointSize(20.0f);
+	glLineWidth(20.0f);
 
 	initRender();
 	initGame();

@@ -59,18 +59,18 @@ void resetWorld(void) {
 	player_one.position = (iVec2){ WORLD_SIZE / 4, WORLD_SIZE / 2};
 	memset(player_one.trace, 0, sizeof(player_one.trace));
 	player_one.trace[0] = player_one.position;
-	player_one.input = inputOne.Rigt;
+	player_one.direction = RIGHT;
 	player_one.index = 0;
 
 	player_two.position = (iVec2){ WORLD_SIZE / 4 * 3, WORLD_SIZE / 2};
 	memset(player_two.trace, 0, sizeof(player_two.trace));
 	player_two.trace[0] = player_two.position;
-	player_two.input = inputTwo.Left;
+	player_two.direction = LEFT;
 	player_two.index = 0;
 
-	camera_one.position = (fVec3){0, 0, 0};
+	camera_one.position = (fVec3){-250,-300,250};
 	camera_two.position = (fVec3){0, 0, 0};
-	camera_one.rotation = (fVec3){0, 0, 0};
+	camera_one.rotation = (fVec3){0, 30.f, 0};
 	camera_two.rotation = (fVec3){0, 0, 0};
 	camera_one.input = ' ';
 }
