@@ -5,65 +5,40 @@
 #include "../include/update.h"
 
 // -- Function declaration --
+void spectatorInput(float dt);
+void playerInput(int p);
+float lerp(float a, float b, float t);
 int isOutOfBounds(iVec2 pos);
 int collidedWithWall(iVec2 pos);
 
 // --- Entry Point ---
-void update(float dt) {
+void game_update(float dt) {
+	///TODO remove spectator in the finished game
 	if (spectator == 1) {
-		float speed = 50.0f;
-		float turn = 36.0f;
-		// Camera
-		CameraData *camera = getCameraData(1);
-		Input i = getInput(1);
-		if (i.Upwa == camera->input) {
-			camera->position.z += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-			camera->position.x -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
-		} else if (i.Left == camera->input) {
-			camera->position.x += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-			camera->position.z += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
-		} else if (i.Down == camera->input) {
-			camera->position.z -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-			camera->position.x += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
-		} else if (i.Rigt == camera->input) {
-			camera->position.x -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-			camera->position.z -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;} else
-		if (i.Qsud == camera->input) camera->position.y -= speed * dt; else
-		if (i.Esud == camera->input) camera->position.y += speed * dt;
-		i = getInput(2);
-		if (i.Upwa == camera->input) camera->rotation.y -= turn * dt; else
-		if (i.Left == camera->input) camera->rotation.x -= turn * dt; else
-		if (i.Down == camera->input) camera->rotation.y += turn * dt; else
-		if (i.Rigt == camera->input) camera->rotation.x += turn * dt; else
-		if (i.Qsud == camera->input) camera->rotation.z -= turn * dt; else
-		if (i.Esud == camera->input) camera->rotation.z += turn * dt;
-		
-	//printf("Camera: (%.1f, %.1f, %.1f)(%.1f, %.1f, %.1f)\n", camera->position.x, camera->position.y, camera->position.z, camera->rotation.x, camera->rotation.y, camera->rotation.z);
+		spectatorInput(dt);
 	} else {
-		for (int c=1; c<=2; c++) {
-			///TODO activate player 2
-			if (c == 2) break;
+		for (int p=1; p<=2; p++) {
+			///TODO activate player two
+			if (p == 2) break;
 			
-			PlayerData *player = getPlayerData(c);
-			CameraData *camera = getCameraData(c);
-			///TODO define speed instead of magic number 1
-			if (player->direction == UP) {
-				player->position.y += 1;
-				camera->position.z += 1;
-			} else
-			if (player->direction == LEFT) {
-				player->position.x -= 1;
-				camera->position.x += 1;
-			} else
-			if (player->direction == DOWN) {
-				player->position.y -= 1;
-				camera->position.z -= 1;
-			} else
-			if (player->direction == RIGHT) {
-				player->position.x += 1;
-				camera->position.x -= 1;
-			}
-				
+			playerInput(p);
+
+			// -- Camera movement --
+			CameraData *camera = getCameraData(p);
+			float delta = camera->targetPosition.x - camera->position.x;
+			camera->position.x += delta / 7.5f;
+			delta = camera->targetPosition.y - camera->position.y;
+			camera->position.y += delta / 7.5f;
+			delta = camera->targetPosition.z - camera->position.z;
+			camera->position.z += delta / 7.5f;
+
+			delta = camera->targetRotation.x - camera->rotation.x;
+			///TODO Look into Lerp function			
+			camera->rotation.x += delta / 7.5f;
+			
+			
+			// -- Physics --
+			PlayerData *player = getPlayerData(p);
 			if (collidedWithWall(player->position)) resetWorld();
 	
 			if (isOutOfBounds(player->position)) resetWorld();
@@ -73,6 +48,61 @@ void update(float dt) {
 
 void initGame(void) {
 	resetWorld();
+}
+
+void spectatorInput(float dt) {
+	float speed = 50.0f;
+	float turn = 36.0f;
+	// Camera
+	CameraData *camera = getCameraData(1);
+	Input i = getInput(1);
+	if (i.Upwa == camera->input) {
+		camera->position.z += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.x -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+	} else if (i.Left == camera->input) {
+		camera->position.x += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.z += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+	} else if (i.Down == camera->input) {
+		camera->position.z -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.x += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+	} else if (i.Rigt == camera->input) {
+		camera->position.x -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.z -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;} else
+	if (i.Qsud == camera->input) camera->position.y -= speed * dt; else
+	if (i.Esud == camera->input) camera->position.y += speed * dt;
+	i = getInput(2);
+	if (i.Upwa == camera->input) camera->rotation.y -= turn * dt; else
+	if (i.Left == camera->input) camera->rotation.x -= turn * dt; else
+	if (i.Down == camera->input) camera->rotation.y += turn * dt; else
+	if (i.Rigt == camera->input) camera->rotation.x += turn * dt; else
+	if (i.Qsud == camera->input) camera->rotation.z -= turn * dt; else
+	if (i.Esud == camera->input) camera->rotation.z += turn * dt;
+}
+
+void playerInput(int p) {				
+	PlayerData *player = getPlayerData(p);
+	CameraData *camera = getCameraData(p);
+	///TODO define speed instead of magic number 1
+	if (player->direction == UP) {
+		player->position.y += 1;
+		camera->targetPosition.z += 1;
+	} else
+	if (player->direction == LEFT) {
+		player->position.x -= 1;
+		camera->targetPosition.x += 1;
+	} else
+	if (player->direction == DOWN) {
+		player->position.y -= 1;
+		camera->targetPosition.z -= 1;
+	} else
+	if (player->direction == RIGHT) {
+		player->position.x += 1;
+		camera->targetPosition.x -= 1;
+	}
+}
+
+float lerp(float a, float b, float t) {
+	return a + (b - a) * t;
 }
 
 int isOutOfBounds(iVec2 pos) {

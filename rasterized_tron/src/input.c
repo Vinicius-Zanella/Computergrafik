@@ -3,8 +3,10 @@
 #include "../include/world.h"
 #include "../include/input.h"
 
+void turn(int p);
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (action != GLFW_PRESS) return;	
+	if (action != GLFW_PRESS) return;
 	if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
 
 	//printf("Key: %c, Nr: %d\n", key, key);
@@ -37,29 +39,37 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			printf("Camera: (%.1f, %.1f, %.1f)(%.1f, %.1f, %.1f)\n", camera->position.x, camera->position.y, camera->position.z, camera->rotation.x, camera->rotation.y, camera->rotation.z);
 		}
 	} else {
-		// - Player 1 input -
+		// - Player input -
 		for (int p=1; p<=2; p++) {
 			Input i = getInput(p);
 			Direction *direction = &getPlayerData(p)->direction;
-			CameraData *camera = getCameraData(1);
-			if (key == (int)i.Left) {	///TODO The world is mirrored (up-down)
-				*direction = (*direction - 1) % 4;
-				addCorner(p);	///TODO combine redundant left & right code
-				camera->rotation.x = (*direction) / 4.0f * 360.0f;
-				camera->position = (fVec3){-getPlayerData(1)->position.x + sin(camera->rotation.x/180*M_PI) * 10, -10, getPlayerData(1)->position.y - cos(camera->rotation.x/180*M_PI) * 10};
+			//printf("Pl pos: (%d, %d); ter rot: (%.0f)\n", getPlayerData(1)->position.x, getPlayerData(1)->position.y, getCameraData(1)->rotation.x);
+			if (key == (int)i.Left) {
+				*direction = *direction - 1;
+				if(*direction > 3) {
+					*direction = 3;	// I am using an enum, so it is unsigned. -1 results in a negative overflow
+					getCameraData(p)->rotation.x = 360;	// I have to TP the camera by 360° So that the camera stays in the confids between -90 and 360
+				}
+				turn(p);
 			} else if (key == (int)i.Rigt) {
-				*direction = (*direction + 1) % 4;
-				addCorner(p);
-				camera->rotation.x = (*direction) / 4.0f * 360.0f;
-				camera->position = (fVec3){-getPlayerData(1)->position.x + sin(camera->rotation.x/180*M_PI) * 10, -10, getPlayerData(1)->position.y - cos(camera->rotation.x/180*M_PI) * 10};
-			}
-			
-			/*
-			if (key == (int)i.Upwa && *input != i.Down && *input != i.Upwa) { *input = i.Upwa; addCorner(p); } else
-			if (key == (int)i.Left && *input != i.Rigt && *input != i.Left) { *input = i.Left; addCorner(p); } else
-			if (key == (int)i.Down && *input != i.Upwa && *input != i.Down) { *input = i.Down; addCorner(p); } else
-			if (key == (int)i.Rigt && *input != i.Left && *input != i.Rigt) { *input = i.Rigt; addCorner(p); }
-			*/	
+				*direction = *direction + 1;
+				if(*direction > 3) {
+					*direction = 0;
+					getCameraData(p)->rotation.x = -90;
+				}
+				turn(p);
+			}	
 		}
 	}
 }
+
+void turn(int p) {
+	CameraData *camera = getCameraData(p);
+	Direction *direction = &getPlayerData(p)->direction;
+	addCorner(p);
+	camera->targetRotation.x = (*direction) / 4.0f * 360.0f;
+	camera->targetPosition = (fVec3){-getPlayerData(1)->position.x + sin(camera->targetRotation.x / 180 * M_PI) * 25, -10, getPlayerData(1)->position.y - cos(camera->targetRotation.x / 180 * M_PI) * 25};	
+	//printf("After turn: player(%d, %d), camera(%.0f, %.0f, %.0f)\n", getPlayerData(1)->position.x, getPlayerData(1)->position.y, camera->targetPosition.x, camera->targetPosition.y, camera->targetPosition.z);
+	//printf("Direction: %.0f, delta = %.1f\n", camera->targetRotation.x, (camera->targetRotation.x - camera->rotation.x));
+}
+				

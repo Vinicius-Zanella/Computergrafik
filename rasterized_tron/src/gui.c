@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include "../include/gui.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "../include/stb_image.h"
+
+///TODO temp
+int pos_x = 0;
+int pos_y = 0;
+int state = 0; // 0=menu, 1=game, 2=exit
+
+// --- Global ---
+typedef struct {
+	GLuint texture;
+	int texWidth, texHeight, texChannels;
+	const char *filename;
+} TexStruct;
+static TexStruct font = { 0, .filename = "assets/Tron_font-white.svg" };
+
+
+// --- Config ---
+///TODO Settings and variables
+
+// --- Layout ---
+///TODO Buttons
+
+// --- Function declaration ---
+void initTexture(TexStruct *texture);
+
+// --- Entry point ---
+void initGui(void) {
+	initTexture(&font);	/// TODO call this in main
+}
+
+int getStatus() {
+	return state;
+}
+
+void gui_update() {
+	//printf("Update GUI\n");
+	///TODO implement button logic and settings
+	printf("(%d, %d)\n", pos_x, pos_y);
+}
+
+void gui_render() {
+	//printf("Render GUI\n");
+	///TODO implement button display
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1, 0, 0);
+	glBegin(GL_TRIANGLE_STRIP);
+		glVertex2f(-0.5f,-0.5f);
+		glVertex2f( 0.5f,-0.5f);
+		glVertex2f(-0.5f, 0.5f);
+		glVertex2f( 0.5f, 0.5f);
+	glEnd();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, font.texture);
+	
+	glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f( 10,-10); glVertex2f(-1,-1);
+		glTexCoord2f( 10, 10); glVertex2f( 1,-1);
+		glTexCoord2f(-10,-10); glVertex2f(-1, 1);
+		glTexCoord2f(-10, 10); glVertex2f( 1, 1);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
+void gui_keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+	if (action != GLFW_PRESS) return;
+	///TODO: if escape close game. Only start if set to game start
+	if(key == GLFW_KEY_ESCAPE) {
+		state = 2;
+		//glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+	if(key == GLFW_KEY_ENTER) {
+		state = 1;
+	}
+
+	//printf("Key: %c, %d\n", key, key);
+
+	if(key == 265) pos_y += 1;	// UP
+	if(key == 263) pos_x -= 1;	// LEFT
+	if(key == 264) pos_y -= 1;	// DOWN
+	if(key == 262) pos_x += 1;	// RIGHT
+}
+
+/// TODO: put texture structures in a separate file
+void initTexture(TexStruct *texture) {
+	unsigned char *data = stbi_load(texture->filename, &texture->texWidth, &texture->texHeight, &texture->texChannels, STBI_rgb_alpha);
+	if (!data) {
+		fprintf(stderr, "Failed to load texture: %s\n", texture->filename);
+		return;
+	}	
+	
+	glGenTextures(1, &texture->texture);
+	glBindTexture(GL_TEXTURE_2D, texture->texture);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->texWidth, texture->texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		
+	stbi_image_free(data);
+}

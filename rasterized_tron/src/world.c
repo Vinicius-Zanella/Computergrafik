@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "../include/world.h"
 
 int spectator = 0;
@@ -68,9 +69,12 @@ void resetWorld(void) {
 	player_two.direction = LEFT;
 	player_two.index = 0;
 
-	camera_one.position = (fVec3){-250,-300,250};
-	camera_two.position = (fVec3){0, 0, 0};
-	camera_one.rotation = (fVec3){0, 30.f, 0};
-	camera_two.rotation = (fVec3){0, 0, 0};
+	camera_one.rotation = (fVec3){0, 0, 0};
+	camera_one.targetRotation = (fVec3){(player_one.direction) / 4.0f * 360.0f, 30.f, 0};
+	camera_one.position = (fVec3){-250, -300, 250};
+	camera_one.targetPosition = (fVec3){-player_one.position.x + sin(camera_one.targetRotation.x / 180 * M_PI) * 25, -10, player_one.position.y - cos(camera_one.targetRotation.x / 180 * M_PI) * 25};
+	//printf("Player position: (%d, %d), tarRotation: %.1f\n", player_one.position.x, player_one.position.y, camera_one.targetRotation.x);
 	camera_one.input = ' ';
+	camera_two.position = (fVec3){0, 0, 0};
+	camera_two.rotation = (fVec3){0, 0, 0};
 }

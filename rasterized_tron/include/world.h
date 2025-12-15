@@ -35,7 +35,9 @@ PlayerData *getPlayerData(int p);
 
 typedef struct {
 	fVec3 position;
+	fVec3 targetPosition;
 	fVec3 rotation;
+	fVec3 targetRotation;
 	int input;
 } CameraData;
 

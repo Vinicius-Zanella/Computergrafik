@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include "../include/gui.h"
 #include "../include/update.h"
 #include "../include/input.h"
 #include "../include/render.h"
@@ -7,18 +8,75 @@
 // --- Config ---
 #define WINDOW_SIZE 600
 
+// --- Declaration ---
+int menu();
+int game();
+
 // --- Entry Point ---
 int main() {
-	if(!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW\n");
-		return 1;
-	}
-
 	// - Set version -
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
+	printf("Initiating Mneu...\n");
+	menu();
+
+	if (getStatus() == 1) {
+		printf("Entering game...\n");
+		game();
+	}
+}
+
+
+int menu() {
+	if(!glfwInit()) {
+		fprintf(stderr, "Failed to initialize GLFW\n");
+		return 1;
+	}
+
+	GLFWwindow* window = glfwCreateWindow(750, 750, "Tron Menu", NULL, NULL);
+	if(!window) {
+		fprintf(stderr, "Failed to create GLFW window\n");
+		glfwTerminate();
+		return 1;
+	}
+
+	glfwMakeContextCurrent(window);
+	glClearColor(0.2f, 0.2f, 0.4f, 1.0f);	// Background Colour
+	glfwSwapInterval(1);	// VSync
+
+	///TODO: Why is the window still resizable
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+	// - Callback -
+	glfwSetKeyCallback(window, gui_keyCallback);
+
+	initGui();
+	
+	// -- Core Loop --
+	while(!glfwWindowShouldClose(window)) {
+		gui_update();
+		gui_render();
+		
+		glfwSwapBuffers(window);		
+		glfwPollEvents();
+		if(getStatus() > 0) glfwSetWindowShouldClose(window, GLFW_TRUE);	// enter game
+	}
+
+	// -- Clean up --
+	glfwDestroyWindow(window);
+	glfwTerminate();
+	return 0;
+}
+
+
+int game() {
+	if(!glfwInit()) {
+		fprintf(stderr, "Failed to initialize GLFW\n");
+		return 1;
+	}
+	
 	GLFWwindow* window = glfwCreateWindow(WINDOW_SIZE, WINDOW_SIZE, "Rasterized Tron", NULL, NULL);
 	if(!window) {
 		fprintf(stderr, "Failed to create GLFW window\n");
@@ -62,8 +120,8 @@ int main() {
 		float dt = currentTime - lastTime;
 		lastTime = currentTime;
 	
-		update(dt);
-		render();
+		game_update(dt);
+		game_render();
 		
 		glfwSwapBuffers(window);		
 		glfwPollEvents();

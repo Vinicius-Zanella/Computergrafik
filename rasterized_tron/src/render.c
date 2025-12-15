@@ -29,7 +29,7 @@ void resize(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void render(void) {
+void game_render(void) {
 	CameraData *camera = getCameraData(1);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -41,6 +41,7 @@ void render(void) {
 	glRotatef(camera->rotation.x, 0.0f, 1.0f, 0.0f);
 	glRotatef(camera->rotation.z, 0.0f, 0.0f, 1.0f);
 	glTranslatef(camera->position.x, camera->position.y, camera->position.z);
+	//glTranslatef(camera->targetPosition.x, camera->targetPosition.y, camera->targetPosition.z);
 
 	///TODO remove
 	glColor3f(1.0f, 1.0f, 1.0f);

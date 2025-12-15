@@ -7,4 +7,4 @@ void initRender(void);
 
 void resize(GLFWwindow *window, int width, int height);
 
-void render(void);
+void game_render(void);
