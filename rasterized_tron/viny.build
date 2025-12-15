@@ -12,10 +12,11 @@ gcc -Wall -c src/render.c -Iinclude -o build/render.o
 gcc -Wall -c src/update.c -Iinclude -o build/update.o
 gcc -Wall -c src/input.c -Iinclude -o build/input.o
 gcc -Wall -c src/world.c -Iinclude -o build/world.o
+gcc -Wall -c src/texture.c -Iinclude -o build/texture.o
 
 
 #gcc build/main.o -o bin/exe -lglfw -lGL -lm
-gcc build/main.o build/gui.o build/render.o build/update.o build/input.o build/world.o -o bin/exe -lglfw -lGL -lm
+gcc build/main.o build/gui.o build/render.o build/update.o build/input.o build/world.o build/texture.o -o bin/exe -lglfw -lGL -lm
 
 ./bin/exe
 

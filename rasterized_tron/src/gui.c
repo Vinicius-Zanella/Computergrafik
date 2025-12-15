@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "../include/gui.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "../include/stb_image.h"
+#include "../include/texture.h"
 
 ///TODO temp
 int pos_x = 0;
@@ -9,13 +8,7 @@ int pos_y = 0;
 int state = 0; // 0=menu, 1=game, 2=exit
 
 // --- Global ---
-typedef struct {
-	GLuint texture;
-	int texWidth, texHeight, texChannels;
-	const char *filename;
-} TexStruct;
 static TexStruct font = { 0, .filename = "assets/Tron_font-white.svg" };
-
 
 // --- Config ---
 ///TODO Settings and variables
@@ -24,11 +17,11 @@ static TexStruct font = { 0, .filename = "assets/Tron_font-white.svg" };
 ///TODO Buttons
 
 // --- Function declaration ---
-void initTexture(TexStruct *texture);
+
 
 // --- Entry point ---
 void initGui(void) {
-	initTexture(&font);	/// TODO call this in main
+	initTexture(&font);
 }
 
 int getStatus() {
@@ -84,24 +77,3 @@ void gui_keyCallback(GLFWwindow *window, int key, int scancode, int action, int 
 	if(key == 262) pos_x += 1;	// RIGHT
 }
 
-/// TODO: put texture structures in a separate file
-void initTexture(TexStruct *texture) {
-	unsigned char *data = stbi_load(texture->filename, &texture->texWidth, &texture->texHeight, &texture->texChannels, STBI_rgb_alpha);
-	if (!data) {
-		fprintf(stderr, "Failed to load texture: %s\n", texture->filename);
-		return;
-	}	
-	
-	glGenTextures(1, &texture->texture);
-	glBindTexture(GL_TEXTURE_2D, texture->texture);
-	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->texWidth, texture->texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		
-	stbi_image_free(data);
-}
