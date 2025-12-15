@@ -8,7 +8,8 @@ int pos_y = 0;
 int state = 0; // 0=menu, 1=game, 2=exit
 
 // --- Global ---
-static TexStruct font = { 0, .filename = "assets/Tron_font-white.svg" };
+//static TexStruct font = { 0, .filename = "assets/Tron_font-white.svg" };
+static TexStruct font = { 0, .filename = "assets/Tron_font-white.png" };
 
 // --- Config ---
 ///TODO Settings and variables
@@ -38,22 +39,16 @@ void gui_render() {
 	//printf("Render GUI\n");
 	///TODO implement button display
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1, 0, 0);
-	glBegin(GL_TRIANGLE_STRIP);
-		glVertex2f(-0.5f,-0.5f);
-		glVertex2f( 0.5f,-0.5f);
-		glVertex2f(-0.5f, 0.5f);
-		glVertex2f( 0.5f, 0.5f);
-	glEnd();
+	glColor3f(1, 1, 1);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, font.texture);
 	
 	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f( 10,-10); glVertex2f(-1,-1);
-		glTexCoord2f( 10, 10); glVertex2f( 1,-1);
-		glTexCoord2f(-10,-10); glVertex2f(-1, 1);
-		glTexCoord2f(-10, 10); glVertex2f( 1, 1);
+		glTexCoord2f( 1,-1); glVertex2f(-0.9f,-0.9f);
+		glTexCoord2f( 1, 1); glVertex2f( 0.9f,-0.9f);
+		glTexCoord2f(-1,-1); glVertex2f(-0.9f, 0.9f);
+		glTexCoord2f(-1, 1); glVertex2f( 0.9f, 0.9f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }
