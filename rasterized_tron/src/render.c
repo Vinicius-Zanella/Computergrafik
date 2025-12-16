@@ -5,49 +5,51 @@
 #include "../include/texture.h"
 
 // -- Global --
+int windowWidth = 1;
+int windowHeight = 1;
 static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px.png" };
+int playerCount = 0;
+struct displayArea *playerViewports;
+
+struct displayArea displayPositions[] = {
+	{{ 0.0f, 0.0f},{ 1.0f, 1.0f}},
+	{{ 0.0f, 0.5f},{ 1.0f, 1.0f}},
+	{{ 0.0f, 0.0f},{ 1.0f, 0.5f}},
+	{{ 0.0f, 0.0f},{ 0.5f, 1.0f}},
+	{{ 0.5f, 0.0f},{ 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f},{ 1.0f, 1.0f}},
+	{{ 0.5f, 0.0f},{ 1.0f, 0.5f}},
+	{{ 0.0f, 0.0f},{ 0.5f, 0.5f}},
+	{{ 0.0f, 0.5f},{ 0.5f, 1.0f}},
+};
 
 // -- Function declaration --
 void drawFloor(void);
 void drawPlayer(int p);
 void drawTrace(int t);
+void renderPlayer(int player);
 
 // --- Entry Point ---
-void initRender(void) {
+void initRender(int _playerCount, int width, int height, struct displayArea *viewports) {
 	initTexture(&checkersTexture);
+	playerCount = _playerCount;
+	windowWidth = width;
+	windowHeight = height;
+	playerViewports = viewports;
 }
 
 void resize(GLFWwindow *window, int width, int height) {
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);	///TODO: remove?
+	windowWidth = width;
+	windowHeight = height;
 }
 
 void game_render(void) {
-	CameraData *camera = getCameraData(1);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glRotatef(camera->rotation.y, 1.0f, 0.0f, 0.0f);
-	glRotatef(camera->rotation.x, 0.0f, 1.0f, 0.0f);
-	glRotatef(camera->rotation.z, 0.0f, 0.0f, 1.0f);
-	glTranslatef(camera->position.x, camera->position.y, camera->position.z);
-	//glTranslatef(camera->targetPosition.x, camera->targetPosition.y, camera->targetPosition.z);
-
-	///TODO remove
-	glColor3f(1.0f, 1.0f, 1.0f);
-	drawFloor();
-
-	glColor3f(1.0f, 0.0f, 0.0f);
-	drawPlayer(1);
-	drawTrace(1);
-
-	glColor3f(0.0f, 1.0f, 0.0f);
-	drawPlayer(2);
-	drawTrace(2);
-
-	///TODO consider more players(4)
+	
+	for (int c=0; c<playerCount; c++) {
+		renderPlayer(c);
+	}
 }
 
 // --- Functions ---
@@ -83,4 +85,32 @@ void drawTrace(int t) {
 			//glVertex3f(player->trace[i].x * step.x - 1, 0, -player->trace[i].y * step.y + 1);
 			glVertex3f(player->trace[i].x, 0, -player->trace[i].y);
 	glEnd();
+}
+
+void renderPlayer(int player) {
+	CameraData *camera = getCameraData(player);
+
+	glViewport(
+		playerViewports[player].start.x * windowWidth,
+		playerViewports[player].start.y * windowHeight,
+		playerViewports[player].end.x * windowWidth,
+		playerViewports[player].end.y * windowHeight);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glRotatef(camera->rotation.y, 1.0f, 0.0f, 0.0f);
+	glRotatef(camera->rotation.x, 0.0f, 1.0f, 0.0f);
+	glRotatef(camera->rotation.z, 0.0f, 0.0f, 1.0f);
+	glTranslatef(camera->position.x, camera->position.y, camera->position.z);
+	//glTranslatef(camera->targetPosition.x, camera->targetPosition.y, camera->targetPosition.z);
+
+	///TODO remove
+	glColor3f(1.0f, 1.0f, 1.0f);
+	drawFloor();
+
+	for(int c=1; c<=playerCount; c++) {
+		glColor3f(1.0f, 0.0f, 0.0f);	///TODO: get correct colour
+		drawPlayer(c);
+		drawTrace(c);	
+	}
 }

@@ -6,7 +6,9 @@
 #include "../include/render.h"
 
 // --- Config ---
-#define WINDOW_SIZE 600
+#define WINDOW_WIDTH 600
+#define WINDOW_HEIGHT 600
+#define PLAYER_COUNT 2
 
 // --- Declaration ---
 int menu();
@@ -49,6 +51,9 @@ int menu() {
 	///TODO: Why is the window still resizable
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// - Callback -
 	glfwSetKeyCallback(window, gui_keyCallback);
 
@@ -77,7 +82,7 @@ int game() {
 		return 1;
 	}
 	
-	GLFWwindow* window = glfwCreateWindow(WINDOW_SIZE, WINDOW_SIZE, "Rasterized Tron", NULL, NULL);
+		GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rasterized Tron", NULL, NULL);
 	if(!window) {
 		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
@@ -94,7 +99,7 @@ int game() {
 	glLoadIdentity();
 
 	double near = 0.01, far = 1000.0, fov = 90.0;
-	double aspect = WINDOW_SIZE / WINDOW_SIZE;
+	double aspect = WINDOW_WIDTH / WINDOW_HEIGHT;
 
 	double top = (fov * 0.5 * M_PI / 180.0) * near;
 	double bottom = -top, right = top * aspect, left = -right;
@@ -109,7 +114,13 @@ int game() {
 	glPointSize(20.0f);
 	glLineWidth(20.0f);
 
-	initRender();
+	/// TODO: calculate displayArea struct
+
+	struct displayArea viewports[] = {
+		displayPositions[NORTH],
+		displayPositions[NORTHWEST],
+	};
+	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
 	initGame();
 
 	float lastTime = 0.0f;
