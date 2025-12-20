@@ -4,6 +4,9 @@
 #include "../include/vector.h"
 #include "../include/update.h"
 
+// --- Global ---
+int playerCount = 0;
+
 // -- Function declaration --
 void spectatorInput(float dt);
 void playerInput(int p);
@@ -12,14 +15,17 @@ int isOutOfBounds(iVec2 pos);
 int collidedWithWall(iVec2 pos);
 
 // --- Entry Point ---
+void initGame(int count) {
+	playerCount = count;
+	resetWorld();
+}
+
 void game_update(float dt) {
 	///TODO remove spectator in the finished game
 	if (spectator == 1) {
 		spectatorInput(dt);
 	} else {
-		for (int p=0; p<=1; p++) {
-			///TODO activate player two
-			//if (p == 1) break;
+		for (int p=0; p<playerCount; p++) {
 			
 			playerInput(p);
 
@@ -33,7 +39,6 @@ void game_update(float dt) {
 			camera->position.z += delta / 7.5f;
 
 			delta = camera->targetRotation.x - camera->rotation.x;
-			///TODO Look into Lerp function			
 			camera->rotation.x += delta / 7.5f;
 			
 			
@@ -44,10 +49,6 @@ void game_update(float dt) {
 			if (isOutOfBounds(player->position)) resetWorld();
 		}
 	}
-}
-
-void initGame(void) {
-	resetWorld();
 }
 
 void spectatorInput(float dt) {
@@ -110,7 +111,7 @@ int isOutOfBounds(iVec2 pos) {
 }
 
 int collidedWithWall(iVec2 pos) {
-	for (int p=1; p<=2; p++) {
+	for (int p=1; p<playerCount; p++) {
 		PlayerData *player = (p == 1) ? getPlayerData(1) : getPlayerData(2);
 		iVec2 *trace = (p == 1) ? getPlayerData(1)->trace : getPlayerData(2)->trace;
 

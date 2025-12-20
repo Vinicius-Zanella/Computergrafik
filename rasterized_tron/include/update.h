@@ -2,4 +2,4 @@
 
 void game_update(float dt);
 
-void initGame(void);
+void initGame(int playerCount);

@@ -3,7 +3,17 @@
 #include "../include/world.h"
 #include "../include/input.h"
 
+// --- Global ---
+int playercount = 0;
+
+// --- Function Declaration ---
 void turn(int p);
+
+
+/// --- Entry Point ---
+void initInput(int count) {
+	playercount = count;
+}
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action != GLFW_PRESS) return;
@@ -18,15 +28,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 	if (spectator) {
 		// - Camera movement -
-		Input i = getInput(1);
-		int *input = &getCameraData(1)->input;
+		Input i = getInput(0);
+		int *input = &getCameraData(0)->input;
 		if (key == (int)i.Upwa) { *input = (*input == (int)i.Upwa) ? ' ' : i.Upwa; } else
 		if (key == (int)i.Left) { *input = (*input == (int)i.Left) ? ' ' : i.Left; } else
 		if (key == (int)i.Down) { *input = (*input == (int)i.Down) ? ' ' : i.Down; } else
 		if (key == (int)i.Rigt) { *input = (*input == (int)i.Rigt) ? ' ' : i.Rigt; } else
 		if (key == (int)i.Qsud) { *input = (*input == (int)i.Qsud) ? ' ' : i.Qsud; } else
 		if (key == (int)i.Esud) { *input = (*input == (int)i.Esud) ? ' ' : i.Esud; }
-		i = getInput(2);
+		i = getInput(1);
 		if (key == (int)i.Upwa) { *input = (*input == (int)i.Upwa) ? ' ' : i.Upwa; } else
 		if (key == (int)i.Left) { *input = (*input == (int)i.Left) ? ' ' : i.Left; } else
 		if (key == (int)i.Down) { *input = (*input == (int)i.Down) ? ' ' : i.Down; } else
@@ -40,7 +50,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		}
 	} else {
 		// - Player input -
-		for (int p=0; p<=1; p++) {
+		for (int p=0; p<playercount; p++) {
 			Input i = getInput(p);
 			Direction *direction = &getPlayerData(p)->direction;
 			//printf("Pl pos: (%d, %d); ter rot: (%.0f)\n", getPlayerData(1)->position.x, getPlayerData(1)->position.y, getCameraData(1)->rotation.x);

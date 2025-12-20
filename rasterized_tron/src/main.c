@@ -121,7 +121,8 @@ int game() {
 		displayPositions[WEST],
 	};
 	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
-	initGame();
+	initInput(PLAYER_COUNT);
+	initGame(PLAYER_COUNT);
 
 	float lastTime = 0.0f;
 	

@@ -8,7 +8,7 @@
 int windowWidth = 1;
 int windowHeight = 1;
 static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px.png" };
-int playerCount = 0;
+int countPlayers = 0;
 struct displayArea *playerViewports;
 
 struct displayArea displayPositions[] = {
@@ -32,7 +32,7 @@ void renderPlayer(int player);
 // --- Entry Point ---
 void initRender(int _playerCount, int width, int height, struct displayArea *viewports) {
 	initTexture(&checkersTexture);
-	playerCount = _playerCount;
+	countPlayers = _playerCount;
 	windowWidth = width;
 	windowHeight = height;
 	playerViewports = viewports;
@@ -48,11 +48,9 @@ void game_render(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	
-	for (int c=0; c<playerCount; c++) {
+	for (int c=0; c<countPlayers; c++) {
 		renderPlayer(c);
 	}
-	
-//	renderPlayer(1);
 }
 
 // --- Functions ---
@@ -60,7 +58,8 @@ void game_render(void) {
 void drawFloor(void) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, checkersTexture.texture);
-
+	glColor3f(1.0f, 1.0f, 1.0f);
+	
 	glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f( 10,-10); glVertex3f( 0,-1, 0);
 		glTexCoord2f( 10, 10); glVertex3f( 0,-1, -WORLD_SIZE);
@@ -72,6 +71,7 @@ void drawFloor(void) {
 
 void drawPlayer(int p) {
 	PlayerData *player = getPlayerData(p);
+	glColor3f(player->color.x, player->color.y, player->color.z);
 	
 	glBegin(GL_POINTS);
 		//glVertex3f(player->position.x * step.x - 1, 0, -player->position.y * step.y + 1);
@@ -81,6 +81,8 @@ void drawPlayer(int p) {
 
 void drawTrace(int t) {
 	PlayerData *player = getPlayerData(t);
+	glColor3f(player->color.x, player->color.y, player->color.z);
+	
 	glBegin(GL_LINE_STRIP);
 		//glVertex3f(player->position.x * step.x - 1, 0, -player->position.y * step.y + 1);
 		glVertex3f(player->position.x, 0, -player->position.y);
@@ -107,13 +109,9 @@ void renderPlayer(int player) {
 	glTranslatef(camera->position.x, camera->position.y, camera->position.z);
 	//glTranslatef(camera->targetPosition.x, camera->targetPosition.y, camera->targetPosition.z);
 
-	///TODO remove
-	glColor3f(1.0f, 1.0f, 1.0f);
 	drawFloor();
 
-	for(int c=0; c<=playerCount; c++) {
-		if(c == 0) glColor3f(1.0f, 0.0f, 0.0f);	///TODO: get correct colour
-		else glColor3f(0, 1, 0);
+	for(int c=0; c<=countPlayers; c++) {
 		drawPlayer(c);
 		drawTrace(c);	
 	}

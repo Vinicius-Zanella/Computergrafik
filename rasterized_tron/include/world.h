@@ -27,6 +27,7 @@ typedef struct {
 	Direction direction;
 	int index;
 	iVec2 trace[WALL_SIZE];
+	fVec3 color;
 } PlayerData;
 
 PlayerData *getPlayerData(int p);

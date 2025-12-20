@@ -6,44 +6,43 @@
 int spectator = 0;
 
 // - Custom input handling -
-static const Input inputOne = {'W', 'A', 'S', 'D', 'Q', 'E'};
-static const Input inputTwo = {'I', 'J', 'K', 'L', 'U', 'O'};
+static const Input input[] = {
+	{'W', 'A', 'S', 'D', 'Q', 'E'},
+	{'I', 'J', 'K', 'L', 'U', 'O'},
+};
 
 Input getInput(int i) {
-	return (i == 0) ? inputOne : inputTwo;
+	return input[i];
 }
 
 
 // - Player stuff -
-static PlayerData  player_one = { 0 };
-static PlayerData  player_two = { 0 };
+static PlayerData players[2];
 
 PlayerData *getPlayerData(int p) {
-	return (p == 0) ? &player_one : &player_two;
+	return &players[p];
 }
 
 
 // - Camera stuff -
-static CameraData camera_one = { 0 };
-static CameraData camera_two = { 0 };
+static CameraData cameras[2];
 
 CameraData *getCameraData(int c) {
-	return (c == 0) ? &camera_one : &camera_two;
+	return &cameras[c];
 }
 
 
 // - Billboard stuff -
-static BillboardData billboard_one = { 0 };
-static BillboardData billboard_two = { 0 };
+static BillboardData billboards[2];
 
 BillboardData *getBillboardData(int b) {
-	return (b == 0) ? &billboard_one : &billboard_two;
+	return &billboards[b];
 }
 
 
 // - Corner management -
 void addCorner(int p) {
-	PlayerData *player = (p == 0) ? &player_one : &player_two;
+	PlayerData *player = &players[p];
 	if (player->index >= WALL_SIZE-1) {
 		printf("Reached maximum wall for Player%d\n", p);
 		resetWorld();	///TODO should anyone reset world or just update? consider returning an error so that update resets
@@ -56,29 +55,30 @@ void addCorner(int p) {
 
 
 // - Reset -
-void resetWorld(void) {
-	player_one.position = (iVec2){ WORLD_SIZE / 4, WORLD_SIZE / 2};
-	memset(player_one.trace, 0, sizeof(player_one.trace));
-	player_one.trace[0] = player_one.position;
-	player_one.direction = RIGHT;
-	player_one.index = 0;
+void resetPlayer(int p) {
+	memset(players[p].trace, 0, sizeof(players[p].trace));
+	players[p].trace[0] = players[p].position;
+	players[p].index = 0;
 
-	player_two.position = (iVec2){ WORLD_SIZE / 4 * 3, WORLD_SIZE / 2};
-	memset(player_two.trace, 0, sizeof(player_two.trace));
-	player_two.trace[0] = player_two.position;
-	player_two.direction = LEFT;
-	player_two.index = 0;
-
-	camera_one.rotation = (fVec3){0, 0, 0};
-	camera_one.targetRotation = (fVec3){(player_one.direction) / 4.0f * 360.0f, 30.f, 0};
-	camera_one.position = (fVec3){-250, -300, 250};
-	camera_one.targetPosition = (fVec3){-player_one.position.x + sin(camera_one.targetRotation.x / 180 * M_PI) * 25, -10, player_one.position.y - cos(camera_one.targetRotation.x / 180 * M_PI) * 25};
-	//printf("Player position: (%d, %d), tarRotation: %.1f\n", player_one.position.x, player_one.position.y, camera_one.targetRotation.x);
-	camera_one.input = ' ';
-	camera_two.rotation = (fVec3){0, 0, 0};
-	camera_two.targetRotation = (fVec3){player_two.direction / 4.0f * 360.0f, 30.0f, 0};
-	camera_two.position = (fVec3){-250, -300, 250};
-	camera_two.targetPosition = (fVec3){-player_two.position.x + sin(camera_two.targetRotation.x / 180 * M_PI) * 25, -10, player_two.position.y - cos(camera_two.targetRotation.x / 180 * M_PI) * 25};
+	cameras[p].rotation = (fVec3){0, 0, 0};
+	cameras[p].targetRotation = (fVec3){(players[p].direction) / 4.0f * 360.0f, 30.f, 0};
+	cameras[p].position = (fVec3){-250, -300, 250};
+	cameras[p].targetPosition = (fVec3){-players[p].position.x + sin(cameras[p].targetRotation.x / 180 * M_PI) * 25, -10, players[p].position.y - cos(cameras[p].targetRotation.x / 180 * M_PI) * 25};
+	cameras[p].input = ' ';
 }
 
-/// TODO: Reset all players
+void resetWorld(void) {
+	///TODO 2 is max player cap. I didn't want to make a world init
+	players[0].position = (iVec2){ WORLD_SIZE / 4, WORLD_SIZE / 2};
+	players[1].position = (iVec2){ WORLD_SIZE / 4 * 3, WORLD_SIZE / 2};
+
+	players[0].direction = RIGHT;
+	players[1].direction = LEFT;
+
+	players[0].color = (fVec3){0, 0, 1};
+	players[1].color = (fVec3){1, 0, 0};
+	
+	for(int p=0; p<2; p++) {
+		resetPlayer(p);
+	}
+}
