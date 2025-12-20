@@ -13,14 +13,14 @@ struct displayArea *playerViewports;
 
 struct displayArea displayPositions[] = {
 	{{ 0.0f, 0.0f},{ 1.0f, 1.0f}},
-	{{ 0.0f, 0.5f},{ 1.0f, 1.0f}},
+	{{ 0.0f, 0.5f},{ 1.0f, 0.5f}},
 	{{ 0.0f, 0.0f},{ 1.0f, 0.5f}},
 	{{ 0.0f, 0.0f},{ 0.5f, 1.0f}},
-	{{ 0.5f, 0.0f},{ 1.0f, 1.0f}},
-	{{ 0.5f, 0.5f},{ 1.0f, 1.0f}},
-	{{ 0.5f, 0.0f},{ 1.0f, 0.5f}},
+	{{ 0.5f, 0.0f},{ 0.5f, 1.0f}},
+	{{ 0.5f, 0.5f},{ 0.5f, 0.5f}},
+	{{ 0.5f, 0.0f},{ 0.5f, 0.5f}},
 	{{ 0.0f, 0.0f},{ 0.5f, 0.5f}},
-	{{ 0.0f, 0.5f},{ 0.5f, 1.0f}},
+	{{ 0.0f, 0.5f},{ 0.5f, 0.5f}},
 };
 
 // -- Function declaration --
@@ -46,10 +46,13 @@ void resize(GLFWwindow *window, int width, int height) {
 
 void game_render(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	
 	for (int c=0; c<playerCount; c++) {
 		renderPlayer(c);
 	}
+	
+//	renderPlayer(1);
 }
 
 // --- Functions ---
@@ -88,7 +91,6 @@ void drawTrace(int t) {
 }
 
 void renderPlayer(int player) {
-	CameraData *camera = getCameraData(player);
 
 	glViewport(
 		playerViewports[player].start.x * windowWidth,
@@ -97,7 +99,8 @@ void renderPlayer(int player) {
 		playerViewports[player].end.y * windowHeight);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	
+	CameraData *camera = getCameraData(player);
 	glRotatef(camera->rotation.y, 1.0f, 0.0f, 0.0f);
 	glRotatef(camera->rotation.x, 0.0f, 1.0f, 0.0f);
 	glRotatef(camera->rotation.z, 0.0f, 0.0f, 1.0f);
@@ -108,8 +111,9 @@ void renderPlayer(int player) {
 	glColor3f(1.0f, 1.0f, 1.0f);
 	drawFloor();
 
-	for(int c=1; c<=playerCount; c++) {
-		glColor3f(1.0f, 0.0f, 0.0f);	///TODO: get correct colour
+	for(int c=0; c<=playerCount; c++) {
+		if(c == 0) glColor3f(1.0f, 0.0f, 0.0f);	///TODO: get correct colour
+		else glColor3f(0, 1, 0);
 		drawPlayer(c);
 		drawTrace(c);	
 	}

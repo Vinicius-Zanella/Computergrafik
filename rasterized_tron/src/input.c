@@ -40,7 +40,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		}
 	} else {
 		// - Player input -
-		for (int p=1; p<=2; p++) {
+		for (int p=0; p<=1; p++) {
 			Input i = getInput(p);
 			Direction *direction = &getPlayerData(p)->direction;
 			//printf("Pl pos: (%d, %d); ter rot: (%.0f)\n", getPlayerData(1)->position.x, getPlayerData(1)->position.y, getCameraData(1)->rotation.x);
@@ -68,7 +68,7 @@ void turn(int p) {
 	Direction *direction = &getPlayerData(p)->direction;
 	addCorner(p);
 	camera->targetRotation.x = (*direction) / 4.0f * 360.0f;
-	camera->targetPosition = (fVec3){-getPlayerData(1)->position.x + sin(camera->targetRotation.x / 180 * M_PI) * 25, -10, getPlayerData(1)->position.y - cos(camera->targetRotation.x / 180 * M_PI) * 25};	
+	camera->targetPosition = (fVec3){-getPlayerData(p)->position.x + sin(camera->targetRotation.x / 180 * M_PI) * 25, -10, getPlayerData(p)->position.y - cos(camera->targetRotation.x / 180 * M_PI) * 25};	
 	//printf("After turn: player(%d, %d), camera(%.0f, %.0f, %.0f)\n", getPlayerData(1)->position.x, getPlayerData(1)->position.y, camera->targetPosition.x, camera->targetPosition.y, camera->targetPosition.z);
 	//printf("Direction: %.0f, delta = %.1f\n", camera->targetRotation.x, (camera->targetRotation.x - camera->rotation.x));
 }

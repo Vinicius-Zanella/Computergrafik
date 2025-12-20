@@ -6,7 +6,7 @@
 #include "../include/render.h"
 
 // --- Config ---
-#define WINDOW_WIDTH 600
+#define WINDOW_WIDTH 700
 #define WINDOW_HEIGHT 600
 #define PLAYER_COUNT 2
 
@@ -117,8 +117,8 @@ int game() {
 	/// TODO: calculate displayArea struct
 
 	struct displayArea viewports[] = {
-		displayPositions[NORTH],
-		displayPositions[NORTHWEST],
+		displayPositions[EAST],
+		displayPositions[WEST],
 	};
 	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
 	initGame();

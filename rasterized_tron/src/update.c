@@ -17,9 +17,9 @@ void game_update(float dt) {
 	if (spectator == 1) {
 		spectatorInput(dt);
 	} else {
-		for (int p=1; p<=2; p++) {
+		for (int p=0; p<=1; p++) {
 			///TODO activate player two
-			if (p == 2) break;
+			//if (p == 1) break;
 			
 			playerInput(p);
 
