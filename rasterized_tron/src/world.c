@@ -51,6 +51,8 @@ void addCorner(int p) {
 	
 	(player->index)++;
 	player->trace[player->index] = player->position;
+
+	//printf("Player: %d, index: %d, pos: (%d, %d)\n", p, player->index, player->position.x, player->position.y);
 }
 
 

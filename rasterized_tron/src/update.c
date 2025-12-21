@@ -111,9 +111,11 @@ int isOutOfBounds(iVec2 pos) {
 }
 
 int collidedWithWall(iVec2 pos) {
-	for (int p=1; p<playerCount; p++) {
-		PlayerData *player = (p == 1) ? getPlayerData(1) : getPlayerData(2);
-		iVec2 *trace = (p == 1) ? getPlayerData(1)->trace : getPlayerData(2)->trace;
+	for (int p=0; p<playerCount; p++) {
+		//PlayerData *player = (p == 1) ? getPlayerData(1) : getPlayerData(2);
+		PlayerData *player = getPlayerData(p);
+		//iVec2 *trace = (p == 1) ? getPlayerData(1)->trace : getPlayerData(2)->trace;
+		iVec2 *trace = player->trace;
 
 		for (int c=0; c<player->index; c++) {
 			// - Horizontal -
