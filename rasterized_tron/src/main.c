@@ -6,10 +6,9 @@
 #include "../include/render.h"
 
 // --- Config ---
-#define WINDOW_WIDTH 700
+#define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 #define PLAYER_COUNT 2
-
 // --- Declaration ---
 int menu();
 int game();
@@ -30,14 +29,13 @@ int main() {
 	}
 }
 
-
 int menu() {
 	if(!glfwInit()) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return 1;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(750, 750, "Tron Menu", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(720, 720,  "Tron Menu", NULL, NULL);
 	if(!window) {
 		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
@@ -48,17 +46,20 @@ int menu() {
 	glClearColor(0.2f, 0.2f, 0.4f, 1.0f);	// Background Colour
 	glfwSwapInterval(1);	// VSync
 
-	///TODO: Why is the window still resizable
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// - Callback -
+	glfwSetFramebufferSizeCallback(window, gui_resize);
 	glfwSetKeyCallback(window, gui_keyCallback);
 
-	initGui();
-	
+	///TODO remove
+	glPointSize(20.0f);
+
+	initGui(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	//glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);	
+
 	// -- Core Loop --
 	while(!glfwWindowShouldClose(window)) {
 		gui_update();
@@ -71,18 +72,12 @@ int menu() {
 
 	// -- Clean up --
 	glfwDestroyWindow(window);
-	glfwTerminate();
 	return 0;
 }
 
 
-int game() {
-	if(!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW\n");
-		return 1;
-	}
-	
-		GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rasterized Tron", NULL, NULL);
+int game() {	
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rasterized Tron", NULL, NULL);
 	if(!window) {
 		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
@@ -107,7 +102,7 @@ int game() {
 	glFrustum(left, right, bottom, top, near, far);
 
 	// - Callback -
-	glfwSetFramebufferSizeCallback(window, resize);
+	glfwSetFramebufferSizeCallback(window, render_resize);
 	glfwSetKeyCallback(window, keyCallback);
 	
 	///TODO remove

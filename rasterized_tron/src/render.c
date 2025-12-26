@@ -38,7 +38,7 @@ void initRender(int _playerCount, int width, int height, struct displayArea *vie
 	playerViewports = viewports;
 }
 
-void resize(GLFWwindow *window, int width, int height) {
+void render_resize(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);	///TODO: remove?
 	windowWidth = width;
 	windowHeight = height;

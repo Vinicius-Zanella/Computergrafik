@@ -22,9 +22,8 @@ enum displayOrder {
 
 extern struct displayArea displayPositions[];
 
-
 void initRender(int _playerCount, int width, int height, struct displayArea *viewports);
 
-void resize(GLFWwindow *window, int width, int height);
+void render_resize(GLFWwindow *window, int width, int height);
 
 void game_render(void);

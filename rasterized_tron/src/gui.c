@@ -27,12 +27,16 @@ const char *settings[] = {
 void writeLine(const char *line, fVec2 start, fVec2 end);
 
 // --- Entry point ---
-void initGui(void) {
+void initGui(int width, int height) {
 	initTexture(&font);
 }
 
 int getStatus() {
 	return state;
+}
+
+void gui_resize(GLFWwindow *window, int width, int height) {
+	glViewport(0, 0, width, height);
 }
 
 void gui_update() {
@@ -57,6 +61,15 @@ void gui_render() {
 		else glColor3f(1, 1, 1);
 		writeLine(settings[c], (fVec2){-0.2f, 0.6f-(c*0.2f)}, (fVec2){0.1f, 0.1f});
 	}
+
+	glColor3f(1, 0.25f, 0.25f);
+	glBegin(GL_POINTS);
+		glVertex2f( 0, 0);
+		glVertex2f(-1, 1);
+		glVertex2f(-1,-1);
+		glVertex2f( 1, 1);
+		glVertex2f( 1,-1);
+	glEnd();
 }
 
 void gui_keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
