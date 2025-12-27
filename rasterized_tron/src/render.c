@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <GL/gl.h>
+#include <math.h>
 #include "../include/world.h"
 #include "../include/render.h"
 #include "../include/texture.h"
@@ -7,9 +8,18 @@
 // -- Global --
 int windowWidth = 1;
 int windowHeight = 1;
-static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px.png" };
+static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px_dark.png" };
+static TexStruct lightCycleTexture = { 0, .filename = "assets/light_cycle_250.png"};
 int countPlayers = 0;
 struct displayArea *playerViewports;
+
+struct Sprite {
+	float startX;
+	float endX;
+	float startY;
+	float endY;
+};
+
 
 struct displayArea displayPositions[] = {
 	{{ 0.0f, 0.0f},{ 1.0f, 1.0f}},
@@ -32,6 +42,7 @@ void renderPlayer(int player);
 // --- Entry Point ---
 void initRender(int _playerCount, int width, int height, struct displayArea *viewports) {
 	initTexture(&checkersTexture);
+	initTexture(&lightCycleTexture);
 	countPlayers = _playerCount;
 	windowWidth = width;
 	windowHeight = height;
@@ -47,7 +58,6 @@ void render_resize(GLFWwindow *window, int width, int height) {
 void game_render(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	
 	for (int c=0; c<countPlayers; c++) {
 		renderPlayer(c);
 	}
@@ -67,6 +77,8 @@ void drawFloor(void) {
 		glTexCoord2f(-10, 10); glVertex3f(WORLD_SIZE,-1, -WORLD_SIZE);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
+
+	///TODO: One corner renders a square wrong
 }
 
 void drawPlayer(int p) {
@@ -77,6 +89,76 @@ void drawPlayer(int p) {
 		//glVertex3f(player->position.x * step.x - 1, 0, -player->position.y * step.y + 1);
 		glVertex3f(player->position.x, 0, -player->position.y);		
 	glEnd();
+}
+
+void drawBike(int p, int c) {
+	PlayerData *player = getPlayerData(p);
+	CameraData *camera = getCameraData(c);
+
+	//calculate angle
+	float angle = atan((player->position.x + camera->position.x)/(player->position.y - camera->position.z));	// Camera.x is inverted
+	// Adjust parameters
+	angle = angle * (180/M_PI);
+	angle += 90;
+	if(camera->position.z < player->position.y) {
+		angle = 180 - angle;
+	}
+	
+	//printf("A(%d, %d), B(%f, %f) Angle: %f\n", player->position.x, player->position.y, camera->position.x, camera->position.z, angle);
+	//printf("Angle: %f\n", angle);	
+
+	struct Sprite sprite;
+	if(angle < 22.5f) {
+		sprite.startX = 0.0f;
+		sprite.endX = 0.5f;
+		sprite.startY = 0.0f;
+		sprite.endY = 0.5f;
+	} else
+	if(angle < 67.5f) {
+		sprite.startX = 0.5f;
+		sprite.endX = 1.0f;
+		sprite.startY = 0.5f;
+		sprite.endY = 1.0f;
+	} else
+	if(angle < 112.5f) {
+		sprite.startX = 0.5f;
+		sprite.endX = 1.0f;
+		sprite.startY = 0.0f;
+		sprite.endY = 0.5f;
+	} else
+	if(angle < 157.5f) {
+		sprite.startX = 0.5f;
+		sprite.endX = 1.0f;
+		sprite.startY = 0.5f;
+		sprite.endY = 1.0f;
+	} else {
+		sprite.startX = 0.0f;
+		sprite.endX = 0.5f;
+		sprite.startY = 0.5f;
+		sprite.endY = 1.0f;
+	}
+	
+	
+	///TODO: Draw at position
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, lightCycleTexture.texture);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	
+	glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f(sprite.startX, sprite.endY ); glVertex3f( player->position.x - 6,-1, -player->position.y);
+		glTexCoord2f(sprite.endX, 	sprite.endY ); glVertex3f( player->position.x + 6,-1, -player->position.y);
+		glTexCoord2f(sprite.startX, sprite.startY ); glVertex3f( player->position.x - 6, 3, -player->position.y);
+		glTexCoord2f(sprite.endX, 	sprite.startY ); glVertex3f( player->position.x + 6, 3, -player->position.y);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+
+	///TODO: REOMVE
+	/*
+	glColor3f(player->color.x, player->color.y, player->color.z);
+	glBegin(GL_POINTS);
+		glVertex3f(player->position.x, 0, -player->position.y);		
+	glEnd();
+	*/
 }
 
 void drawTrace(int t) {
@@ -111,8 +193,14 @@ void renderPlayer(int player) {
 
 	drawFloor();
 
+	///TODO:  remove
+	if(player == 0) {
+		drawBike(0, 0);
+	}
+
 	for(int c=0; c<=countPlayers; c++) {
-		drawPlayer(c);
-		drawTrace(c);	
+		//drawPlayer(c);
+		//drawBike(c, player);
+		drawTrace(c);
 	}
 }

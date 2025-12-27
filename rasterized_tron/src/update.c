@@ -55,8 +55,8 @@ void spectatorInput(float dt) {
 	float speed = 50.0f;
 	float turn = 36.0f;
 	// Camera
-	CameraData *camera = getCameraData(1);
-	Input i = getInput(1);
+	CameraData *camera = getCameraData(0);
+	Input i = getInput(0);
 	if (i.Upwa == camera->input) {
 		camera->position.z += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
 		camera->position.x -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
@@ -71,7 +71,7 @@ void spectatorInput(float dt) {
 		camera->position.z -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;} else
 	if (i.Qsud == camera->input) camera->position.y -= speed * dt; else
 	if (i.Esud == camera->input) camera->position.y += speed * dt;
-	i = getInput(2);
+	i = getInput(1);
 	if (i.Upwa == camera->input) camera->rotation.y -= turn * dt; else
 	if (i.Left == camera->input) camera->rotation.x -= turn * dt; else
 	if (i.Down == camera->input) camera->rotation.y += turn * dt; else

@@ -88,6 +88,13 @@ int game() {
 	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);	// Background Colour
 	glfwSwapInterval(1);	// VSync
 
+	// - Callback -
+	glfwSetFramebufferSizeCallback(window, render_resize);
+	glfwSetKeyCallback(window, keyCallback);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// - 3D Config -
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
@@ -100,10 +107,6 @@ int game() {
 	double bottom = -top, right = top * aspect, left = -right;
 
 	glFrustum(left, right, bottom, top, near, far);
-
-	// - Callback -
-	glfwSetFramebufferSizeCallback(window, render_resize);
-	glfwSetKeyCallback(window, keyCallback);
 	
 	///TODO remove
 	glPointSize(20.0f);
