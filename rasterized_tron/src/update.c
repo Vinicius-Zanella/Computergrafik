@@ -32,7 +32,11 @@ void game_update(float dt) {
 			// -- Camera movement --
 			CameraData *camera = getCameraData(p);
 			float delta = camera->targetPosition.x - camera->position.x;
+			if (-0.01 < delta && delta < 0.01) delta = 0;
 			camera->position.x += delta / 7.5f;
+
+			//printf("target - pos = delta: %f - %f = %f \n",camera->targetPosition.x, camera->position.x, delta / 7.5f);
+			
 			delta = camera->targetPosition.y - camera->position.y;
 			camera->position.y += delta / 7.5f;
 			delta = camera->targetPosition.z - camera->position.z;
@@ -53,7 +57,7 @@ void game_update(float dt) {
 
 void spectatorInput(float dt) {
 	float speed = 50.0f;
-	float turn = 36.0f;
+	float turn = 42.0f;
 	// Camera
 	CameraData *camera = getCameraData(0);
 	Input i = getInput(0);

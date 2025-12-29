@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <GL/gl.h>
 #include <math.h>
+#include <stdlib.h>
 #include "../include/world.h"
 #include "../include/render.h"
 #include "../include/texture.h"
@@ -9,7 +10,7 @@
 int windowWidth = 1;
 int windowHeight = 1;
 static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px_dark.png" };
-static TexStruct lightCycleTexture = { 0, .filename = "assets/light_cycle_250.png"};
+static TexStruct lightCycleTexture = { 0, .filename = "assets/light_cycle_5-400px.png"};
 int countPlayers = 0;
 struct displayArea *playerViewports;
 
@@ -96,75 +97,57 @@ void drawBike(int p, int c) {
 	CameraData *camera = getCameraData(c);
 
 	//calculate angle
-	float angle = atan((player->position.x + camera->position.x)/(player->position.y - camera->position.z));	// Camera.x is inverted
+	float angle = atan((player->position.x + camera->position.x)/(player->position.y - camera->position.z));
+	/// ----- TODO: Make this calculation relative to the facing direction! -----
+		// Direction eum: 0 UP, 1 RIGHT, 2 DOWN, 3 LEFT
+
 	// Adjust parameters
-	angle = angle * (180/M_PI);
+	float facing = angle;
+	angle = angle * (180 / M_PI);
 	angle += 90;
 	if(camera->position.z < player->position.y) {
 		angle = 180 - angle;
 	}
-	
-	//printf("A(%d, %d), B(%f, %f) Angle: %f\n", player->position.x, player->position.y, camera->position.x, camera->position.z, angle);
-	//printf("Angle: %f\n", angle);	
 
-	struct Sprite sprite;
+	//printf("A(%d, %d), B(%f, %f) Angle: %f\n", player->position.x, player->position.y, camera->position.x, camera->position.z, angle);
+	printf("Angle: %f\n", angle);
+
+	int sprite;
 	if(angle < 22.5f) {
-		sprite.startX = 0.0f;
-		sprite.endX = 0.5f;
-		sprite.startY = 0.0f;
-		sprite.endY = 0.5f;
+		sprite = 0;
 	} else
 	if(angle < 67.5f) {
-		sprite.startX = 0.5f;
-		sprite.endX = 1.0f;
-		sprite.startY = 0.5f;
-		sprite.endY = 1.0f;
+		sprite = 1;
 	} else
 	if(angle < 112.5f) {
-		sprite.startX = 0.5f;
-		sprite.endX = 1.0f;
-		sprite.startY = 0.0f;
-		sprite.endY = 0.5f;
+		sprite = 2;
 	} else
 	if(angle < 157.5f) {
-		sprite.startX = 0.5f;
-		sprite.endX = 1.0f;
-		sprite.startY = 0.5f;
-		sprite.endY = 1.0f;
+		sprite = 3;
 	} else {
-		sprite.startX = 0.0f;
-		sprite.endX = 0.5f;
-		sprite.startY = 0.5f;
-		sprite.endY = 1.0f;
+		sprite = 4;
 	}
-	
-	
-	///TODO: Draw at position
+	//sprite = sprite - abs((int)(player->direction - 1) * 2);
+	//printf("Sprite: %d\n", sprite);
+
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, lightCycleTexture.texture);
 	glColor3f(1.0f, 1.0f, 1.0f);
-	
+
+	int width = 6;
 	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(sprite.startX, sprite.endY ); glVertex3f( player->position.x - 6,-1, -player->position.y);
-		glTexCoord2f(sprite.endX, 	sprite.endY ); glVertex3f( player->position.x + 6,-1, -player->position.y);
-		glTexCoord2f(sprite.startX, sprite.startY ); glVertex3f( player->position.x - 6, 3, -player->position.y);
-		glTexCoord2f(sprite.endX, 	sprite.startY ); glVertex3f( player->position.x + 6, 3, -player->position.y);
+		glTexCoord2f(0 + sprite * 0.2f, 	1); glVertex3f( player->position.x - width * cos(facing), -1, -player->position.y - width * sin(facing));
+		glTexCoord2f(0.2f + sprite * 0.2f, 	1); glVertex3f( player->position.x + width * cos(facing), -1, -player->position.y + width * sin(facing));
+		glTexCoord2f(0 + sprite * 0.2f, 	0);	glVertex3f( player->position.x - width * cos(facing),  3, -player->position.y - width * sin(facing));
+		glTexCoord2f(0.2f + sprite * 0.2f, 	0);	glVertex3f( player->position.x + width * cos(facing),  3, -player->position.y + width * sin(facing));
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
-
-	///TODO: REOMVE
-	/*
-	glColor3f(player->color.x, player->color.y, player->color.z);
-	glBegin(GL_POINTS);
-		glVertex3f(player->position.x, 0, -player->position.y);		
-	glEnd();
-	*/
 }
 
 void drawTrace(int t) {
 	PlayerData *player = getPlayerData(t);
 	glColor3f(player->color.x, player->color.y, player->color.z);
-	
+
 	glBegin(GL_LINE_STRIP);
 		//glVertex3f(player->position.x * step.x - 1, 0, -player->position.y * step.y + 1);
 		glVertex3f(player->position.x, 0, -player->position.y);
