@@ -7,7 +7,7 @@ int getStatus();
 
 // void initRender(void);
 
-void initGui(int width, int height);
+void initGui();
 
 void gui_resize(GLFWwindow *window, int width, int height);
 

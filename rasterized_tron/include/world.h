@@ -53,6 +53,6 @@ typedef struct {
 BillboardData *getBillboardData(int b);
 
 
-void addCorner(int p);
+int addCorner(int p);
 
 void resetWorld(void);

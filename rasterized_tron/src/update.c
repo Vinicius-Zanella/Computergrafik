@@ -4,6 +4,15 @@
 #include "../include/vector.h"
 #include "../include/update.h"
 
+// --- Constants ---
+#define CAMERA_FACTOR 7.5f
+#define CAMERA_APPROXIMATION 0.1f
+
+#define SPECTATOR_SPEED 50.f
+#define SPECTATOR_TURN 42.f
+
+#define PLAYER_SPEED 1;
+
 // --- Global ---
 int playerCount = 0;
 
@@ -24,99 +33,92 @@ void game_update(float dt) {
 	///TODO remove spectator in the finished game
 	if (spectator == 1) {
 		spectatorInput(dt);
-	} else {
-		for (int p=0; p<playerCount; p++) {
-			
-			playerInput(p);
-
-			// -- Camera movement --
-			CameraData *camera = getCameraData(p);
-			float delta = camera->targetPosition.x - camera->position.x;
-			if (-0.01 < delta && delta < 0.01) delta = 0;
-			camera->position.x += delta / 7.5f;
-
-			//printf("target - pos = delta: %f - %f = %f \n",camera->targetPosition.x, camera->position.x, delta / 7.5f);
-
-			
-			delta = camera->targetPosition.y - camera->position.y;
-			if (-0.1f < delta && delta < 0.1f) camera->position.y = camera->targetPosition.y;
-			else camera->position.y += delta / 7.5f;
-			delta = camera->targetPosition.z - camera->position.z;
-			if (-0.1f < delta && delta < 0.1f) camera->position.z = camera->targetPosition.z;
-			else camera->position.z += delta / 7.5f;
-
-			delta = camera->targetRotation.x - camera->rotation.x;
-			if (-0.1f < delta && delta < 0.1f) camera->rotation.x = camera->targetRotation.x;
-			else camera->rotation.x += delta / 7.5f;
-			//printf("Delta: %f\n", delta);
-
-			//camera->position.y = camera->targetPosition.y;
-			//camera->position.z = camera->targetPosition.z;
-			//camera->rotation.x = camera->targetRotation.x;
-			
-			
-			// -- Physics --
-			PlayerData *player = getPlayerData(p);
-			if (collidedWithWall(player->position)) resetWorld();
+		return;
+	}
 	
-			if (isOutOfBounds(player->position)) resetWorld();
-		}
+	for (int p=0; p<playerCount; p++) {
+		playerInput(p);
+
+		// -- Camera movement --
+		CameraData *camera = getCameraData(p);
+		float delta = camera->targetPosition.x - camera->position.x;
+		if (-CAMERA_APPROXIMATION < delta && delta < CAMERA_APPROXIMATION) delta = 0;
+		else camera->position.x += delta / CAMERA_FACTOR;
+			
+		delta = camera->targetPosition.y - camera->position.y;
+		if (-CAMERA_APPROXIMATION < delta && delta < CAMERA_APPROXIMATION) camera->position.y = camera->targetPosition.y;
+		else camera->position.y += delta / CAMERA_FACTOR;
+
+		delta = camera->targetPosition.z - camera->position.z;
+		if (-CAMERA_APPROXIMATION < delta && delta < CAMERA_APPROXIMATION) camera->position.z = camera->targetPosition.z;
+		else camera->position.z += delta / CAMERA_FACTOR;
+
+		delta = camera->targetRotation.x - camera->rotation.x;
+		if (-CAMERA_APPROXIMATION < delta && delta < CAMERA_APPROXIMATION) camera->rotation.x = camera->targetRotation.x;
+		else camera->rotation.x += delta / CAMERA_FACTOR;
+			
+		// -- Physics --
+		PlayerData *player = getPlayerData(p);
+		if (collidedWithWall(player->position)) resetWorld();
+	
+		if (isOutOfBounds(player->position)) resetWorld();
 	}
 }
 
+
 void spectatorInput(float dt) {
-	float speed = 50.0f;
-	float turn = 42.0f;
 	// Camera
 	CameraData *camera = getCameraData(0);
+	const float angleYaw = camera->rotation.x / 180.f * M_PI;
+	const float cosYaw = cosf(angleYaw);
+	const float sinYaw = sinf(angleYaw);
+	
 	Input i = getInput(0);
 	if (i.Upwa == camera->input) {
-		camera->position.z += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-		camera->position.x -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.z += SPECTATOR_SPEED * cosYaw * dt;
+		camera->position.x -= SPECTATOR_SPEED * sinYaw * dt;
 	} else if (i.Left == camera->input) {
-		camera->position.x += speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-		camera->position.z += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.x += SPECTATOR_SPEED * cosYaw * dt;
+		camera->position.z += SPECTATOR_SPEED * sinYaw * dt;
 	} else if (i.Down == camera->input) {
-		camera->position.z -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-		camera->position.x += speed * sin(camera->rotation.x / 180.f * M_PI) * dt;
+		camera->position.z -= SPECTATOR_SPEED * cosYaw * dt;
+		camera->position.x += SPECTATOR_SPEED * sinYaw * dt;
 	} else if (i.Rigt == camera->input) {
-		camera->position.x -= speed * cos(camera->rotation.x / 180.f * M_PI) * dt;
-		camera->position.z -= speed * sin(camera->rotation.x / 180.f * M_PI) * dt;} else
-	if (i.Qsud == camera->input) camera->position.y -= speed * dt; else
-	if (i.Esud == camera->input) camera->position.y += speed * dt;
+		camera->position.x -= SPECTATOR_SPEED * cosYaw * dt;
+		camera->position.z -= SPECTATOR_SPEED * sinYaw * dt;} else
+	if (i.Qsud == camera->input) camera->position.y -= SPECTATOR_SPEED * dt; else
+	if (i.Esud == camera->input) camera->position.y += SPECTATOR_SPEED * dt;
 	i = getInput(1);
-	if (i.Upwa == camera->input) camera->rotation.y -= turn * dt; else
-	if (i.Left == camera->input) camera->rotation.x -= turn * dt; else
-	if (i.Down == camera->input) camera->rotation.y += turn * dt; else
-	if (i.Rigt == camera->input) camera->rotation.x += turn * dt; else
-	if (i.Qsud == camera->input) camera->rotation.z -= turn * dt; else
-	if (i.Esud == camera->input) camera->rotation.z += turn * dt;
+	if (i.Upwa == camera->input) camera->rotation.y -= SPECTATOR_TURN * dt; else
+	if (i.Left == camera->input) camera->rotation.x -= SPECTATOR_TURN * dt; else
+	if (i.Down == camera->input) camera->rotation.y += SPECTATOR_TURN * dt; else
+	if (i.Rigt == camera->input) camera->rotation.x += SPECTATOR_TURN * dt; else
+	if (i.Qsud == camera->input) camera->rotation.z -= SPECTATOR_TURN * dt; else
+	if (i.Esud == camera->input) camera->rotation.z += SPECTATOR_TURN * dt;
 }
 
+///TODO make delta time based?
 void playerInput(int p) {				
 	PlayerData *player = getPlayerData(p);
 	CameraData *camera = getCameraData(p);
-	///TODO define speed instead of magic number 1
-	if (player->direction == UP) {
-		player->position.y += 1;
-		camera->targetPosition.z += 1;
-	} else
-	if (player->direction == LEFT) {
-		player->position.x -= 1;
-		camera->targetPosition.x += 1;
-	} else
-	if (player->direction == DOWN) {
-		player->position.y -= 1;
-		camera->targetPosition.z -= 1;
-	} else
-	if (player->direction == RIGHT) {
-		player->position.x += 1;
-		camera->targetPosition.x -= 1;
+	switch (player->direction) {
+		case UP:
+			player->position.y += PLAYER_SPEED;
+			camera->targetPosition.z += PLAYER_SPEED;
+			break;
+		case LEFT:
+			player->position.x -= PLAYER_SPEED;
+			camera->targetPosition.x += PLAYER_SPEED;
+			break;
+		case DOWN:
+			player->position.y -= PLAYER_SPEED;
+			camera->targetPosition.z -= PLAYER_SPEED;
+			break;
+		case RIGHT:
+			player->position.x += PLAYER_SPEED;
+			camera->targetPosition.x -= PLAYER_SPEED;
+			break;
 	}
-}
-
-float lerp(float a, float b, float t) {
-	return a + (b - a) * t;
 }
 
 int isOutOfBounds(iVec2 pos) {
@@ -125,20 +127,21 @@ int isOutOfBounds(iVec2 pos) {
 
 int collidedWithWall(iVec2 pos) {
 	for (int p=0; p<playerCount; p++) {
-		//PlayerData *player = (p == 1) ? getPlayerData(1) : getPlayerData(2);
 		PlayerData *player = getPlayerData(p);
-		//iVec2 *trace = (p == 1) ? getPlayerData(1)->trace : getPlayerData(2)->trace;
 		iVec2 *trace = player->trace;
 
 		for (int c=0; c<player->index; c++) {
+			iVec2 a = trace[c];
+			iVec2 b = trace[c+1];
+			
 			// - Horizontal -
-			if (trace[c].y == pos.y && trace[c+1].y == pos.y) {
-				if (fmin(trace[c].x, trace[c+1].x) < pos.x && pos.x < fmax(trace[c].x, trace[c+1].x))
+			if (a.y == pos.y && b.y == pos.y) {
+				if (fmin(a.x, b.x) < pos.x && pos.x < fmax(a.x, b.x))
 					return 1;
 			}
 			// - Vertical -
-			if (trace[c].x == pos.x && pos.x == trace[c+1].x) {
-				if (fmin(trace[c].y, trace[c+1].y) < pos.y && pos.y < fmax(trace[c].y, trace[c+1].y))
+			if (a.x == pos.x && pos.x == b.x) {
+				if (fmin(a.y, b.y) < pos.y && pos.y < fmax(a.y, b.y))
 					return 1;
 			}
 		}

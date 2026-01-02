@@ -7,20 +7,13 @@
 #include "../include/texture.h"
 
 // -- Global --
-int windowWidth = 1;
-int windowHeight = 1;
+static int windowWidth = 1;
+static int windowHeight = 1;
 static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px_dark.png" };
 static TexStruct lightCycleTexture = { 0, .filename = "assets/light_cycle_5-400px.png"};
 static TexStruct lightTraceTexture = { 0, .filename = "assets/light-bike_trace_128.png"};
-int countPlayers = 0;
+static int countPlayers = 0;
 struct displayArea *playerViewports;
-
-struct Sprite {
-	float startX;
-	float endX;
-	float startY;
-	float endY;
-};
 
 struct displayArea displayPositions[] = {
 	{{ 0.0f, 0.0f},{ 1.0f, 1.0f}},
@@ -36,7 +29,6 @@ struct displayArea displayPositions[] = {
 
 // -- Function declaration --
 void drawFloor(void);
-void drawPlayer(int p);
 void drawTrace(int t);
 void renderPlayer(int player);
 
@@ -52,6 +44,8 @@ void initRender(int _playerCount, int width, int height, struct displayArea *vie
 }
 
 void render_resize(GLFWwindow *window, int width, int height) {
+	(void)window;
+	
 	windowWidth = width;
 	windowHeight = height;
 }
@@ -77,17 +71,6 @@ void drawFloor(void) {
 		glTexCoord2f(-1, 1); glVertex3f(WORLD_SIZE,-1, -WORLD_SIZE);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
-
-	///TODO: One corner renders a square wrong
-}
-
-void drawPlayer(int p) {
-	PlayerData *player = getPlayerData(p);
-	//glColor3f(player->color.x, player->color.y, player->color.z);
-	
-	glBegin(GL_POINTS);
-		glVertex3f(player->position.x, 0, -player->position.y);		
-	glEnd();
 }
 
 void drawBike(int p, int c) {
@@ -95,11 +78,15 @@ void drawBike(int p, int c) {
 	CameraData *camera = getCameraData(c);
 
 	//calculate angle
-	float angle = atan((player->position.x + camera->position.x)/(player->position.y - camera->position.z));
+	float angle = atan2(
+		player->position.x + camera->position.x,
+		player->position.y - camera->position.z
+	);
 
 	// Adjust parameters
 	float facing = angle;
 	angle = angle * (180 / M_PI);
+
 	if(camera->position.z <= player->position.y) { angle = 180 + angle; }
 	
 	angle -= 90 * player->direction;
@@ -136,7 +123,6 @@ void drawBike(int p, int c) {
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, lightCycleTexture.texture);
-	//glColor3f(1.0f, 1.0f, 1.0f);
 
 	int width = 6;
 	glBegin(GL_TRIANGLE_STRIP);
@@ -150,7 +136,6 @@ void drawBike(int p, int c) {
 
 void drawTrace(int t) {
 	PlayerData *player = getPlayerData(t);
-	//glColor3f(player->color.x, player->color.y, player->color.z);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, lightTraceTexture.texture);
@@ -186,7 +171,7 @@ void renderPlayer(int player) {
 
 	drawFloor();
 
-	for(int c=0; c<=countPlayers; c++) {
+	for(int c=0; c<countPlayers; c++) {
 		glColor3f(getPlayerData(c)->color.x, getPlayerData(c)->color.y, getPlayerData(c)->color.z);
 		drawTrace(c);
 		drawBike(c, player);

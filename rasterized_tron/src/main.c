@@ -8,14 +8,14 @@
 // --- Config ---
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-#define PLAYER_COUNT 2
+#define PLAYER_COUNT 4
+
 // --- Declaration ---
-int menu();
-int game();
+static int menu(void);
+static int game(void);
 
 // --- Entry Point ---
-int main() {
-	// - Set version -
+int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -25,11 +25,13 @@ int main() {
 
 	if (getStatus() == 1) {
 		printf("Entering game...\n");
-		game();
+		return game();
 	}
+
+	return 0;
 }
 
-int menu() {
+static int menu(void) {
 	if(!glfwInit()) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return 1;
@@ -43,8 +45,9 @@ int menu() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glClearColor(0.2f, 0.2f, 0.4f, 1.0f);	// Background Colour
 	glfwSwapInterval(1);	// VSync
+
+	glClearColor(0.2f, 0.2f, 0.4f, 1.0f);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -53,12 +56,7 @@ int menu() {
 	glfwSetFramebufferSizeCallback(window, gui_resize);
 	glfwSetKeyCallback(window, gui_keyCallback);
 
-	///TODO remove
-	glPointSize(20.0f);
-
-	initGui(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	//glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);	
+	initGui();
 
 	// -- Core Loop --
 	while(!glfwWindowShouldClose(window)) {
@@ -67,7 +65,9 @@ int menu() {
 		
 		glfwSwapBuffers(window);		
 		glfwPollEvents();
-		if(getStatus() > 0) glfwSetWindowShouldClose(window, GLFW_TRUE);	// enter game
+		
+		if(getStatus() > 0)
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 
 	// -- Clean up --
@@ -75,8 +75,7 @@ int menu() {
 	return 0;
 }
 
-
-int game() {	
+static int game(void) {	
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rasterized Tron", NULL, NULL);
 	if(!window) {
 		fprintf(stderr, "Failed to create GLFW window\n");
@@ -85,8 +84,9 @@ int game() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);	// Background Colour
 	glfwSwapInterval(1);	// VSync
+
+	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 
 	// - Callback -
 	glfwSetFramebufferSizeCallback(window, render_resize);
@@ -100,24 +100,21 @@ int game() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	double near = 0.01, far = 1000.0, fov = 90.0;
-	double aspect = WINDOW_WIDTH / WINDOW_HEIGHT;
+	const double near = 0.01, far = 1000.0, fov = 90.0;
+	const double aspect = WINDOW_WIDTH / WINDOW_HEIGHT;
 
-	double top = (fov * 0.5 * M_PI / 180.0) * near;
-	double bottom = -top, right = top * aspect, left = -right;
+	const double top = (fov * 0.5 * M_PI / 180.0) * near;
+	const double bottom = -top, right = top * aspect, left = -right;
 
 	glFrustum(left, right, bottom, top, near, far);
-	
-	///TODO remove
-	glPointSize(20.0f);
-	glLineWidth(20.0f);
-
-	/// TODO: calculate displayArea struct
 
 	struct displayArea viewports[] = {
-		displayPositions[EAST],
-		displayPositions[WEST],
+		displayPositions[NORTHWEST],
+		displayPositions[NORTHEAST],
+		displayPositions[SOUTHWEST],
+		displayPositions[SOUTHEAST],
 	};
+	
 	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
 	initInput(PLAYER_COUNT);
 	initGame(PLAYER_COUNT);

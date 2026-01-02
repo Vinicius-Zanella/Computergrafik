@@ -3,12 +3,16 @@
 #include <math.h>
 #include "../include/world.h"
 
+#define MAX_PLAYERS  4
+
 int spectator = 0;
 
 // - Custom input handling -
-static const Input input[] = {
+static const Input input[MAX_PLAYERS] = {
 	{'W', 'A', 'S', 'D', 'Q', 'E'},
 	{'I', 'J', 'K', 'L', 'U', 'O'},
+	{9, 7, 8, 6, 10, 11},
+	{'G', 'V', 'B', 'N', 'F', 'H'},
 };
 
 Input getInput(int i) {
@@ -17,7 +21,7 @@ Input getInput(int i) {
 
 
 // - Player stuff -
-static PlayerData players[2];
+static PlayerData players[MAX_PLAYERS];
 
 PlayerData *getPlayerData(int p) {
 	return &players[p];
@@ -25,34 +29,26 @@ PlayerData *getPlayerData(int p) {
 
 
 // - Camera stuff -
-static CameraData cameras[2];
+static CameraData cameras[MAX_PLAYERS];
 
 CameraData *getCameraData(int c) {
 	return &cameras[c];
 }
 
 
-// - Billboard stuff -
-static BillboardData billboards[2];
-
-BillboardData *getBillboardData(int b) {
-	return &billboards[b];
-}
-
-
 // - Corner management -
-void addCorner(int p) {
+int addCorner(int p) {
 	PlayerData *player = &players[p];
-	if (player->index >= WALL_SIZE-1) {
+	
+	if (player->index >= WALL_SIZE - 1) {
 		printf("Reached maximum wall for Player%d\n", p);
-		resetWorld();	///TODO should anyone reset world or just update? consider returning an error so that update resets
-		return;
+		resetWorld();	/// TODO: Make update reset the world through return values. But first you have to get addCorner out of input
+		return 0;
 	}
 	
 	(player->index)++;
 	player->trace[player->index] = player->position;
-
-	//printf("Player: %d, index: %d, pos: (%d, %d)\n", p, player->index, player->position.x, player->position.y);
+	return 1;
 }
 
 
@@ -70,17 +66,22 @@ void resetPlayer(int p) {
 }
 
 void resetWorld(void) {
-	///TODO 2 is max player cap. I didn't want to make a world init
-	players[0].position = (iVec2){ WORLD_SIZE / 4, WORLD_SIZE / 2};
-	players[1].position = (iVec2){ WORLD_SIZE / 4 * 3, WORLD_SIZE / 2};
+	players[0].position = (iVec2){ WORLD_SIZE / 4,		WORLD_SIZE / 2};
+	players[1].position = (iVec2){ WORLD_SIZE / 4 * 3, 	WORLD_SIZE / 2};
+	players[2].position = (iVec2){ WORLD_SIZE / 2, 		WORLD_SIZE / 4 * 3};
+	players[3].position = (iVec2){ WORLD_SIZE / 2, 		WORLD_SIZE / 4};
 
 	players[0].direction = RIGHT;
 	players[1].direction = LEFT;
+	players[2].direction = DOWN;
+	players[3].direction = UP;
 
 	players[0].color = (fVec3){0, 0, 1};
 	players[1].color = (fVec3){1, 0, 0};
+	players[2].color = (fVec3){0, 1, 0};
+	players[3].color = (fVec3){1, 1, 1};
 	
-	for(int p=0; p<2; p++) {
+	for(int p=0; p<MAX_PLAYERS; p++) {
 		resetPlayer(p);
 	}
 }
