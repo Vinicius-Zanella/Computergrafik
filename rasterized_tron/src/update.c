@@ -36,14 +36,23 @@ void game_update(float dt) {
 			camera->position.x += delta / 7.5f;
 
 			//printf("target - pos = delta: %f - %f = %f \n",camera->targetPosition.x, camera->position.x, delta / 7.5f);
+
 			
 			delta = camera->targetPosition.y - camera->position.y;
-			camera->position.y += delta / 7.5f;
+			if (-0.1f < delta && delta < 0.1f) camera->position.y = camera->targetPosition.y;
+			else camera->position.y += delta / 7.5f;
 			delta = camera->targetPosition.z - camera->position.z;
-			camera->position.z += delta / 7.5f;
+			if (-0.1f < delta && delta < 0.1f) camera->position.z = camera->targetPosition.z;
+			else camera->position.z += delta / 7.5f;
 
 			delta = camera->targetRotation.x - camera->rotation.x;
-			camera->rotation.x += delta / 7.5f;
+			if (-0.1f < delta && delta < 0.1f) camera->rotation.x = camera->targetRotation.x;
+			else camera->rotation.x += delta / 7.5f;
+			//printf("Delta: %f\n", delta);
+
+			//camera->position.y = camera->targetPosition.y;
+			//camera->position.z = camera->targetPosition.z;
+			//camera->rotation.x = camera->targetRotation.x;
 			
 			
 			// -- Physics --

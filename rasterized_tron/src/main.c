@@ -8,7 +8,7 @@
 // --- Config ---
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-#define PLAYER_COUNT 1
+#define PLAYER_COUNT 2
 // --- Declaration ---
 int menu();
 int game();
@@ -115,7 +115,7 @@ int game() {
 	/// TODO: calculate displayArea struct
 
 	struct displayArea viewports[] = {
-		displayPositions[FULL],
+		displayPositions[EAST],
 		displayPositions[WEST],
 	};
 	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
