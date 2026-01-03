@@ -27,10 +27,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		printf("Spectator: %d\n", spectator);
 	}
 
-	printf("Key: %d, mod: %d\n", key, key & 255);
-	key = key % 256;
+	key = key % 255;
 	
-
 	if (spectator) {
 		// - Camera movement -
 		Input i = getInput(0);

@@ -8,7 +8,7 @@
 // --- Config ---
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-#define PLAYER_COUNT 4
+#define PLAYER_COUNT 2
 
 // --- Declaration ---
 static int menu(void);
@@ -108,12 +108,20 @@ static int game(void) {
 
 	glFrustum(left, right, bottom, top, near, far);
 
-	struct displayArea viewports[] = {
-		displayPositions[NORTHWEST],
-		displayPositions[NORTHEAST],
-		displayPositions[SOUTHWEST],
-		displayPositions[SOUTHEAST],
-	};
+	struct displayArea viewports[4];
+	if (PLAYER_COUNT == 1) {
+		viewports[0] = displayPositions[FULL];
+	}
+	if (PLAYER_COUNT == 2) {
+		viewports[0] = displayPositions[WEST];
+		viewports[1] = displayPositions[EAST];
+	}
+	if (PLAYER_COUNT > 2) {
+		viewports[0] = displayPositions[NORTHWEST];
+		viewports[1] = displayPositions[NORTHEAST];
+		viewports[2] = displayPositions[SOUTHWEST];
+		viewports[3] = displayPositions[SOUTHEAST];
+	}
 	
 	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
 	initInput(PLAYER_COUNT);

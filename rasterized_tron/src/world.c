@@ -11,7 +11,7 @@ int spectator = 0;
 static const Input input[MAX_PLAYERS] = {
 	{'W', 'A', 'S', 'D', 'Q', 'E'},
 	{'I', 'J', 'K', 'L', 'U', 'O'},
-	{9, 7, 8, 6, 10, 11},
+	{10, 8, 9, 7, 11, 12},
 	{'G', 'V', 'B', 'N', 'F', 'H'},
 };
 

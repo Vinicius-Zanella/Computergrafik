@@ -35,7 +35,7 @@ void game_update(float dt) {
 		spectatorInput(dt);
 		return;
 	}
-	
+
 	for (int p=0; p<playerCount; p++) {
 		playerInput(p);
 
