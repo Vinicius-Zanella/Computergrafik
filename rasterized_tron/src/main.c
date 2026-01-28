@@ -100,7 +100,7 @@ static int game(void) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	const double near = 0.01, far = 1000.0, fov = 90.0;
+	const double near = 0.01, far = 1000.0, fov = 100.0;
 	const double aspect = WINDOW_WIDTH / WINDOW_HEIGHT;
 
 	const double top = (fov * 0.5 * M_PI / 180.0) * near;
@@ -108,6 +108,7 @@ static int game(void) {
 
 	glFrustum(left, right, bottom, top, near, far);
 
+	// Window alignment based on player count
 	struct displayArea viewports[4];
 	if (PLAYER_COUNT == 1) {
 		viewports[0] = displayPositions[FULL];

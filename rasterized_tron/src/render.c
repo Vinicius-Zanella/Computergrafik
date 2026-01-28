@@ -174,6 +174,9 @@ void renderPlayer(int player) {
 	for(int c=0; c<countPlayers; c++) {
 		glColor3f(getPlayerData(c)->color.x, getPlayerData(c)->color.y, getPlayerData(c)->color.z);
 		drawTrace(c);
+	}
+	for(int c=0; c<countPlayers; c++) {
+		glColor3f(getPlayerData(c)->color.x, getPlayerData(c)->color.y, getPlayerData(c)->color.z);
 		drawBike(c, player);
 	}
 	glColor3f(1, 1, 1);

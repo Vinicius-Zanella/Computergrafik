@@ -59,9 +59,15 @@ void resetPlayer(int p) {
 	players[p].index = 0;
 
 	cameras[p].rotation = (fVec3){0, 0, 0};
-	cameras[p].targetRotation = (fVec3){(players[p].direction) / 4.0f * 360.0f, 30.f, 0};
+	cameras[p].targetRotation = (fVec3){
+		(players[p].direction) / 4.0f * 360.0f,
+		-30.f,
+		0};
 	cameras[p].position = (fVec3){-250, -300, 250};
-	cameras[p].targetPosition = (fVec3){-players[p].position.x + sin(cameras[p].targetRotation.x / 180 * M_PI) * 25, -10, players[p].position.y - cos(cameras[p].targetRotation.x / 180 * M_PI) * 25};
+	cameras[p].targetPosition = (fVec3){
+		-players[p].position.x + sin(cameras[p].targetRotation.x / 180 * M_PI) * 25,
+		-10,
+		players[p].position.y - cos(cameras[p].targetRotation.x / 180 * M_PI) * 25};
 	cameras[p].input = ' ';
 }
 
