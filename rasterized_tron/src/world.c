@@ -85,7 +85,12 @@ void resetWorld(void) {
 	players[0].color = (fVec3){0, 0, 1};
 	players[1].color = (fVec3){1, 0, 0};
 	players[2].color = (fVec3){0, 1, 0};
-	players[3].color = (fVec3){1, 1, 1};
+	players[3].color = (fVec3){1, 1, 0};
+
+	players[0].status = ALIVE;
+	players[1].status = ALIVE;
+	players[2].status = ALIVE;
+	players[3].status = ALIVE;
 	
 	for(int p=0; p<MAX_PLAYERS; p++) {
 		resetPlayer(p);

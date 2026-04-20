@@ -9,11 +9,16 @@
 // -- Global --
 static int windowWidth = 1;
 static int windowHeight = 1;
+static int widthOffset = 0;
+static int heightOffset = 0;
 static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px_dark.png" };
 static TexStruct lightCycleTexture = { 0, .filename = "assets/light_cycle_5-400px.png"};
 static TexStruct lightTraceTexture = { 0, .filename = "assets/light-bike_trace_128.png"};
 static int countPlayers = 0;
 struct displayArea *playerViewports;
+
+// -- Functions --
+void drawExplosion(int);
 
 struct displayArea displayPositions[] = {
 	{{ 0.0f, 0.0f},{ 1.0f, 1.0f}},
@@ -46,8 +51,12 @@ void initRender(int _playerCount, int width, int height, struct displayArea *vie
 void render_resize(GLFWwindow *window, int width, int height) {
 	(void)window;
 	
-	windowWidth = width;
-	windowHeight = height;
+	int size = fmin(width, height);
+	int diff = fmax(width, height) - size;
+	widthOffset = width<height ? 0 : diff / 2;
+	heightOffset = height<width ? 0 : diff / 2;
+	windowWidth = size;
+	windowHeight = size;
 }
 
 void game_render(void) {
@@ -93,7 +102,7 @@ void drawBike(int p, int c) {
 	if (angle > 360) angle -= 360;
 	if (angle < 0) angle += 360;
 
-	int sprite;
+	int sprite;	/// TODO: Fix correct direction
 	if(angle < 22.5f) {
 		sprite = 0;
 	} else
@@ -154,10 +163,9 @@ void drawTrace(int t) {
 }
 
 void renderPlayer(int player) {
-
 	glViewport(
-		playerViewports[player].start.x * windowWidth,
-		playerViewports[player].start.y * windowHeight,
+		playerViewports[player].start.x * windowWidth + widthOffset,
+		playerViewports[player].start.y * windowHeight + heightOffset,
 		playerViewports[player].end.x * windowWidth,
 		playerViewports[player].end.y * windowHeight);
 	glMatrixMode(GL_MODELVIEW);
@@ -175,9 +183,41 @@ void renderPlayer(int player) {
 		glColor3f(getPlayerData(c)->color.x, getPlayerData(c)->color.y, getPlayerData(c)->color.z);
 		drawTrace(c);
 	}
+
+	// For each Bike draw explosion or bike depending on state
 	for(int c=0; c<countPlayers; c++) {
 		glColor3f(getPlayerData(c)->color.x, getPlayerData(c)->color.y, getPlayerData(c)->color.z);
-		drawBike(c, player);
+		if (getPlayerData(c)->status == ALIVE) {
+			drawBike(c, player);
+		} else {
+			drawExplosion(c);
+		}
 	}
+
+	// Reset color
 	glColor3f(1, 1, 1);
+}
+
+void drawExplosion(int p) {
+	PlayerData *player = getPlayerData(p);
+	fVec2 pos = { player->position.x, -player->position.y };
+
+	float angle;
+	if (player->direction == 0) angle = -1;
+	else angle = player->direction - 1;
+	angle *= M_PI/2;
+
+	glBegin(GL_LINES);
+		glVertex3f(pos.x, 0, pos.y);
+		glVertex3f(pos.x + cos(angle + 0.3) * player->status, player->status * 0.7, pos.y + sin(angle - 0.2) * player->status);
+		glVertex3f(pos.x, 0, pos.y);
+		glVertex3f(pos.x + cos(angle - 0.5) * player->status, player->status * 0.5, pos.y + sin(angle + 0.6) * player->status);
+		glVertex3f(pos.x, 0, pos.y);
+		glVertex3f(pos.x + cos(angle + 0.6) * player->status, player->status * 0.3, pos.y + sin(angle - 0.7) * player->status);
+		glVertex3f(pos.x, 0, pos.y);
+		glVertex3f(pos.x + cos(angle - 0.6) * player->status, player->status * 0.2, pos.y + sin(angle + 0.5) * player->status);
+		glVertex3f(pos.x, 0, pos.y);
+		glVertex3f(pos.x + cos(angle + 0.2) * player->status, player->status * 0.1, pos.y + sin(angle - 0.3) * player->status);
+	glEnd();
+	player->status++;
 }

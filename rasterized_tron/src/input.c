@@ -4,25 +4,25 @@
 #include "../include/input.h"
 
 // --- Global ---
-int playercount = 0;
+int playercount;
 
 // --- Function Declaration ---
 void turn(int p);
 
-/// --- Entry Point ---
+// --- Entry Point ---
 void initInput(int count) {
 	playercount = count;
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	(void)scancode;
+	(void)scancode;		// Silence compiler
 	(void)mods;
 
 	if (action != GLFW_PRESS) return;
 	
 	if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-	if (key == ' ') {
+	if (key == ' ') {	// TODO: remove
 		spectator = (spectator == 1) ? 0 : 1;
 		printf("Spectator: %d\n", spectator);
 	}
@@ -46,11 +46,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		if (key == (int)i.Rigt) { *input = (*input == (int)i.Rigt) ? ' ' : i.Rigt; } else
 		if (key == (int)i.Qsud) { *input = (*input == (int)i.Qsud) ? ' ' : i.Qsud; } else
 		if (key == (int)i.Esud) { *input = (*input == (int)i.Esud) ? ' ' : i.Esud; }
-
-		if (key == 'C') {
-			CameraData *camera = getCameraData(0);
-			printf("Camera: (%.1f, %.1f, %.1f)(%.1f, %.1f, %.1f)\n", camera->position.x, camera->position.y, camera->position.z, camera->rotation.x, camera->rotation.y, camera->rotation.z);
-		}
 	} else {
 		// - Player input -
 		for (int p=0; p<playercount; p++) {
@@ -78,12 +73,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void turn(int p) {
 	CameraData *camera = getCameraData(p);
 	PlayerData *player = getPlayerData(p);
-	addCorner(p);
+	
+	addCorner(p);	/// TODO: Convert to radians
 	camera->targetRotation.x = (player->direction) / 4.0f * 360.0f;
 	float angle = camera->targetRotation.x / 180.f * M_PI;
 	camera->targetPosition =
 		(fVec3){-player->position.x +  sin(angle) * 25,
 		-10,
 		player->position.y - cos(angle) * 25
-	};	
+		};
+
 }

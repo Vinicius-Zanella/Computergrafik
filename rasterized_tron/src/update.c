@@ -15,6 +15,9 @@
 
 // --- Global ---
 int playerCount = 0;
+int freeze = 0;
+int freezeTime = 5;
+float timer = 0;
 
 // -- Function declaration --
 void spectatorInput(float dt);
@@ -22,6 +25,7 @@ void playerInput(int p);
 float lerp(float a, float b, float t);
 int isOutOfBounds(iVec2 pos);
 int collidedWithWall(iVec2 pos);
+void gameOver(float dt);
 
 // --- Entry Point ---
 void initGame(int count) {
@@ -30,7 +34,12 @@ void initGame(int count) {
 }
 
 void game_update(float dt) {
-	///TODO remove spectator in the finished game
+	if (freeze == 1) {
+		gameOver(dt);
+		return;
+	}
+
+	///TODO remove spectator in the finished game	
 	if (spectator == 1) {
 		spectatorInput(dt);
 		return;
@@ -59,9 +68,15 @@ void game_update(float dt) {
 			
 		// -- Physics --
 		PlayerData *player = getPlayerData(p);
-		if (collidedWithWall(player->position)) resetWorld();
+		if (collidedWithWall(player->position)) {
+			player->status = DEAD;
+			gameOver(dt);
+		}
 	
-		if (isOutOfBounds(player->position)) resetWorld();
+		if (isOutOfBounds(player->position)) {
+			player->status = DEAD;
+			gameOver(dt);
+		}
 	}
 }
 
@@ -157,4 +172,17 @@ int collidedWithWall(iVec2 pos) {
 		}
 	}
 	return 0;
+}
+
+
+void gameOver(float dt) {
+	freeze = 1;
+
+	timer += dt;
+
+	if (timer >= freezeTime) {
+		freeze = 0;
+		timer = 0;
+		resetWorld();
+	}
 }

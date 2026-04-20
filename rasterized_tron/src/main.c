@@ -8,7 +8,6 @@
 // --- Config ---
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-#define PLAYER_COUNT 2
 
 // --- Declaration ---
 static int menu(void);
@@ -20,7 +19,7 @@ int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
-	printf("Initiating Mneu...\n");
+	printf("Initiating Menu...\n");
 	menu();
 
 	if (getStatus() == 1) {
@@ -110,23 +109,12 @@ static int game(void) {
 
 	// Window alignment based on player count
 	struct displayArea viewports[4];
-	if (PLAYER_COUNT == 1) {
-		viewports[0] = displayPositions[FULL];
-	}
-	if (PLAYER_COUNT == 2) {
-		viewports[0] = displayPositions[WEST];
-		viewports[1] = displayPositions[EAST];
-	}
-	if (PLAYER_COUNT > 2) {
-		viewports[0] = displayPositions[NORTHWEST];
-		viewports[1] = displayPositions[NORTHEAST];
-		viewports[2] = displayPositions[SOUTHWEST];
-		viewports[3] = displayPositions[SOUTHEAST];
-	}
+	viewports[0] = displayPositions[WEST];
+	viewports[1] = displayPositions[EAST];
 	
-	initRender(PLAYER_COUNT, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
-	initInput(PLAYER_COUNT);
-	initGame(PLAYER_COUNT);
+	initRender(2, WINDOW_WIDTH, WINDOW_HEIGHT, viewports);
+	initInput(2);
+	initGame(2);
 
 	float lastTime = 0.0f;
 	

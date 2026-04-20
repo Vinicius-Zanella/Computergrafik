@@ -31,8 +31,23 @@ int getStatus() {
 }
 
 void gui_resize(GLFWwindow *window, int width, int height) {
-	(void)window;	// Shut up the compiler
-	glViewport(0, 0, width, height);
+	(void)window;	// Silence compiler
+
+	int size;
+	int widthOffset;
+	int heightOffset;
+
+	if (width < height) {
+		size = width;
+		widthOffset = 0;
+		heightOffset = (height - width) / 2;
+	} else {
+		size = height;
+		heightOffset = 0;
+		widthOffset = (width - height) / 2;
+	}
+
+	glViewport(widthOffset, heightOffset, size, size);
 }
 
 void gui_update(void) {
@@ -69,7 +84,7 @@ void gui_render() {
 void gui_keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	(void)window;
 	(void)scancode;
-	(void)mods;	// Shut up the compiler
+	(void)mods;	// Silence compiler
 	
 	if (action != GLFW_PRESS) return;
 
@@ -91,7 +106,7 @@ void gui_keyCallback(GLFWwindow *window, int key, int scancode, int action, int 
 
 // --- Text rendering ---
 static void writeLine(const char *line, fVec2 start, fVec2 size) {
-	if (!line || !font.texture) return;	// Negative space programming
+	if (!line || !font.texture) return;
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, font.texture);

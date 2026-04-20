@@ -22,12 +22,17 @@ typedef enum {
 	UP, RIGHT, DOWN, LEFT
 } Direction;
 
+typedef enum {
+	ALIVE, DEAD
+} Status;
+
 typedef struct {
 	iVec2 position;
 	Direction direction;
 	int index;
 	iVec2 trace[WALL_SIZE];
 	fVec3 color;
+	int status;
 } PlayerData;
 
 PlayerData *getPlayerData(int p);
