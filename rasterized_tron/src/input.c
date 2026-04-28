@@ -37,16 +37,19 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 static void playerInput(int p, int key) {
 	Input i = getInput(p);
 	Direction *direction = &getPlayerData(p)->direction;
-	if (key == i.Left) {
+	
+	if (key == (int)i.Left) {
 		*direction = *direction - 1;
 		if(*direction > 3) {
 			*direction = 3;	// enum is an unsigned int
+			getCameraData(p)->rotation.x = 360;
 		}
 		turn(p);
-	} else if (key == i.Rigt) {
+	} else if (key == (int)i.Rigt) {
 		*direction = *direction + 1;
 		if(*direction > 3) {
 			*direction = 0;
+			getCameraData(p)->rotation.x = -90;
 		}
 		turn(p);
 	}
