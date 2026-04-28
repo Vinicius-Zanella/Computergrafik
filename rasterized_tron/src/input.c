@@ -7,6 +7,7 @@
 int playercount;
 
 // --- Function Declaration ---
+void playerInput(int p, int key);
 void turn(int p);
 
 // --- Entry Point ---
@@ -22,51 +23,32 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	
 	if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-	if (key == ' ') {	// TODO: remove
-		spectator = (spectator == 1) ? 0 : 1;
-		printf("Spectator: %d\n", spectator);
-	}
-
 	key = key % 255;
 	
-	if (spectator) {
-		// - Camera movement -
-		Input i = getInput(0);
-		int *input = &getCameraData(0)->input;
-		if (key == (int)i.Upwa) { *input = (*input == (int)i.Upwa) ? ' ' : i.Upwa; } else
-		if (key == (int)i.Left) { *input = (*input == (int)i.Left) ? ' ' : i.Left; } else
-		if (key == (int)i.Down) { *input = (*input == (int)i.Down) ? ' ' : i.Down; } else
-		if (key == (int)i.Rigt) { *input = (*input == (int)i.Rigt) ? ' ' : i.Rigt; } else
-		if (key == (int)i.Qsud) { *input = (*input == (int)i.Qsud) ? ' ' : i.Qsud; } else
-		if (key == (int)i.Esud) { *input = (*input == (int)i.Esud) ? ' ' : i.Esud; }
-		i = getInput(1);
-		if (key == (int)i.Upwa) { *input = (*input == (int)i.Upwa) ? ' ' : i.Upwa; } else
-		if (key == (int)i.Left) { *input = (*input == (int)i.Left) ? ' ' : i.Left; } else
-		if (key == (int)i.Down) { *input = (*input == (int)i.Down) ? ' ' : i.Down; } else
-		if (key == (int)i.Rigt) { *input = (*input == (int)i.Rigt) ? ' ' : i.Rigt; } else
-		if (key == (int)i.Qsud) { *input = (*input == (int)i.Qsud) ? ' ' : i.Qsud; } else
-		if (key == (int)i.Esud) { *input = (*input == (int)i.Esud) ? ' ' : i.Esud; }
-	} else {
-		// - Player input -
-		for (int p=0; p<playercount; p++) {
-			Input i = getInput(p);
-			Direction *direction = &getPlayerData(p)->direction;
-			if (key == (int)i.Left) {
-				*direction = *direction - 1;
-				if(*direction > 3) {
-					*direction = 3;	// I am using an enum, so it is unsigned. -1 results in a negative overflow
-					getCameraData(p)->rotation.x = 360;	// I have to TP the camera by 360° So that the camera stays in the confids between -90 and 360
-				}
-				turn(p);
-			} else if (key == (int)i.Rigt) {
-				*direction = *direction + 1;
-				if(*direction > 3) {
-					*direction = 0;
-					getCameraData(p)->rotation.x = -90;
-				}
-				turn(p);
-			}	
+	// - Player input -
+	for (int p=0; p<playercount; p++) {
+			playerInput(p, key);
+	}
+}
+
+
+// -- Functions --
+
+void playerInput(int p, int key) {
+	Input i = getInput(p);
+	Direction *direction = &getPlayerData(p)->direction;
+	if (key == i.Left) {
+		*direction = *direction - 1;
+		if(*direction > 3) {
+			*direction = 3;	// enum is an unsigned int
 		}
+		turn(p);
+	} else if (key == i.Rigt) {
+		*direction = *direction + 1;
+		if(*direction > 3) {
+			*direction = 0;
+		}
+		turn(p);
 	}
 }
 
@@ -74,7 +56,7 @@ void turn(int p) {
 	CameraData *camera = getCameraData(p);
 	PlayerData *player = getPlayerData(p);
 	
-	addCorner(p);	/// TODO: Convert to radians
+	addCorner(p);
 	camera->targetRotation.x = (player->direction) / 4.0f * 360.0f;
 	float angle = camera->targetRotation.x / 180.f * M_PI;
 	camera->targetPosition =
@@ -82,5 +64,4 @@ void turn(int p) {
 		-10,
 		player->position.y - cos(angle) * 25
 		};
-
 }

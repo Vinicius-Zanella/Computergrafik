@@ -38,13 +38,7 @@ void game_update(float dt) {
 		gameOver(dt);
 		return;
 	}
-
-	///TODO remove spectator in the finished game	
-	if (spectator == 1) {
-		spectatorInput(dt);
-		return;
-	}
-
+	
 	for (int p=0; p<playerCount; p++) {
 		playerInput(p);
 
@@ -112,7 +106,6 @@ void spectatorInput(float dt) {
 	if (i.Esud == camera->input) camera->rotation.z += SPECTATOR_TURN * dt;
 }
 
-///TODO make delta time based?
 void playerInput(int p) {				
 	PlayerData *player = getPlayerData(p);
 	CameraData *camera = getCameraData(p);

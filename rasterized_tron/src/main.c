@@ -26,7 +26,6 @@ int main(void) {
 		printf("Entering game...\n");
 		return game();
 	}
-
 	return 0;
 }
 

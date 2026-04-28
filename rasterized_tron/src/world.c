@@ -42,7 +42,7 @@ int addCorner(int p) {
 	
 	if (player->index >= WALL_SIZE - 1) {
 		printf("Reached maximum wall for Player%d\n", p);
-		resetWorld();	/// TODO: Make update reset the world through return values. But first you have to get addCorner out of input
+		resetWorld();
 		return 0;
 	}
 	
