@@ -7,8 +7,8 @@
 int playercount;
 
 // --- Function Declaration ---
-void playerInput(int p, int key);
-void turn(int p);
+static void playerInput(int p, int key);
+static void turn(int p);
 
 // --- Entry Point ---
 void initInput(int count) {
@@ -34,7 +34,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 // -- Functions --
 
-void playerInput(int p, int key) {
+static void playerInput(int p, int key) {
 	Input i = getInput(p);
 	Direction *direction = &getPlayerData(p)->direction;
 	if (key == i.Left) {
@@ -52,7 +52,7 @@ void playerInput(int p, int key) {
 	}
 }
 
-void turn(int p) {
+static void turn(int p) {
 	CameraData *camera = getCameraData(p);
 	PlayerData *player = getPlayerData(p);
 	

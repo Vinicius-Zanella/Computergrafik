@@ -15,10 +15,13 @@ static TexStruct checkersTexture = { 0, .filename = "assets/checkers_2px_dark.pn
 static TexStruct lightCycleTexture = { 0, .filename = "assets/light_cycle_5-400px.png"};
 static TexStruct lightTraceTexture = { 0, .filename = "assets/light-bike_trace_128.png"};
 static int countPlayers = 0;
-struct displayArea *playerViewports;
+static struct displayArea *playerViewports;
 
-// -- Functions --
-void drawExplosion(int);
+// -- Function declaration --
+static void drawFloor(void);
+static void drawTrace(int t);
+static void renderPlayer(int player);
+static void drawExplosion(int);
 
 struct displayArea displayPositions[] = {
 	{{ 0.0f, 0.0f},{ 1.0f, 1.0f}},
@@ -31,11 +34,6 @@ struct displayArea displayPositions[] = {
 	{{ 0.0f, 0.0f},{ 0.5f, 0.5f}},
 	{{ 0.0f, 0.5f},{ 0.5f, 0.5f}},
 };
-
-// -- Function declaration --
-void drawFloor(void);
-void drawTrace(int t);
-void renderPlayer(int player);
 
 // --- Entry Point ---
 void initRender(int _playerCount, int width, int height, struct displayArea *viewports) {
@@ -69,7 +67,7 @@ void game_render(void) {
 
 // --- Functions ---
 
-void drawFloor(void) {
+static void drawFloor(void) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, checkersTexture.texture);
 	
@@ -82,7 +80,7 @@ void drawFloor(void) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void drawBike(int p, int c) {
+static void drawBike(int p, int c) {
 	PlayerData *player = getPlayerData(p);
 	CameraData *camera = getCameraData(c);
 
@@ -143,7 +141,7 @@ void drawBike(int p, int c) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void drawTrace(int t) {
+static void drawTrace(int t) {
 	PlayerData *player = getPlayerData(t);
 
 	glEnable(GL_TEXTURE_2D);
@@ -162,7 +160,7 @@ void drawTrace(int t) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void renderPlayer(int player) {
+static void renderPlayer(int player) {
 	glViewport(
 		playerViewports[player].start.x * windowWidth + widthOffset,
 		playerViewports[player].start.y * windowHeight + heightOffset,
@@ -198,7 +196,7 @@ void renderPlayer(int player) {
 	glColor3f(1, 1, 1);
 }
 
-void drawExplosion(int p) {
+static void drawExplosion(int p) {
 	PlayerData *player = getPlayerData(p);
 	fVec2 pos = { player->position.x, -player->position.y };
 

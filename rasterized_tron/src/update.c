@@ -14,18 +14,18 @@
 #define PLAYER_SPEED 1;
 
 // --- Global ---
-int playerCount = 0;
-int freeze = 0;
-int freezeTime = 5;
-float timer = 0;
+static int playerCount = 0;
+static int freeze = 0;
+static int freezeTime = 5;
+static float timer = 0;
 
 // -- Function declaration --
-void spectatorInput(float dt);
-void playerInput(int p);
-float lerp(float a, float b, float t);
-int isOutOfBounds(iVec2 pos);
-int collidedWithWall(iVec2 pos);
-void gameOver(float dt);
+static void playerInput(int p);
+static int isOutOfBounds(iVec2 pos);
+static int collidedWithWall(iVec2 pos);
+static void gameOver(float dt);
+
+
 
 // --- Entry Point ---
 void initGame(int count) {
@@ -75,38 +75,9 @@ void game_update(float dt) {
 }
 
 
-void spectatorInput(float dt) {
-	// Camera
-	CameraData *camera = getCameraData(0);
-	const float angleYaw = camera->rotation.x / 180.f * M_PI;
-	const float cosYaw = cosf(angleYaw);
-	const float sinYaw = sinf(angleYaw);
-	
-	Input i = getInput(0);
-	if (i.Upwa == camera->input) {
-		camera->position.z += SPECTATOR_SPEED * cosYaw * dt;
-		camera->position.x -= SPECTATOR_SPEED * sinYaw * dt;
-	} else if (i.Left == camera->input) {
-		camera->position.x += SPECTATOR_SPEED * cosYaw * dt;
-		camera->position.z += SPECTATOR_SPEED * sinYaw * dt;
-	} else if (i.Down == camera->input) {
-		camera->position.z -= SPECTATOR_SPEED * cosYaw * dt;
-		camera->position.x += SPECTATOR_SPEED * sinYaw * dt;
-	} else if (i.Rigt == camera->input) {
-		camera->position.x -= SPECTATOR_SPEED * cosYaw * dt;
-		camera->position.z -= SPECTATOR_SPEED * sinYaw * dt;} else
-	if (i.Qsud == camera->input) camera->position.y -= SPECTATOR_SPEED * dt; else
-	if (i.Esud == camera->input) camera->position.y += SPECTATOR_SPEED * dt;
-	i = getInput(1);
-	if (i.Upwa == camera->input) camera->rotation.y -= SPECTATOR_TURN * dt; else
-	if (i.Left == camera->input) camera->rotation.x -= SPECTATOR_TURN * dt; else
-	if (i.Down == camera->input) camera->rotation.y += SPECTATOR_TURN * dt; else
-	if (i.Rigt == camera->input) camera->rotation.x += SPECTATOR_TURN * dt; else
-	if (i.Qsud == camera->input) camera->rotation.z -= SPECTATOR_TURN * dt; else
-	if (i.Esud == camera->input) camera->rotation.z += SPECTATOR_TURN * dt;
-}
 
-void playerInput(int p) {				
+// -- Functions --
+static void playerInput(int p) {
 	PlayerData *player = getPlayerData(p);
 	CameraData *camera = getCameraData(p);
 	switch (player->direction) {
@@ -129,11 +100,11 @@ void playerInput(int p) {
 	}
 }
 
-int isOutOfBounds(iVec2 pos) {
+static int isOutOfBounds(iVec2 pos) {
 	return (pos.x < 0 || pos.y < 0 || pos.x >= WORLD_SIZE || pos.y >= WORLD_SIZE);
 }
 
-int collidedWithWall(iVec2 pos) {
+static int collidedWithWall(iVec2 pos) {
 	for (int p=0; p<playerCount; p++) {
 		PlayerData *player = getPlayerData(p);
 		iVec2 *trace = player->trace;
@@ -167,10 +138,8 @@ int collidedWithWall(iVec2 pos) {
 	return 0;
 }
 
-
-void gameOver(float dt) {
+static void gameOver(float dt) {
 	freeze = 1;
-
 	timer += dt;
 
 	if (timer >= freezeTime) {
